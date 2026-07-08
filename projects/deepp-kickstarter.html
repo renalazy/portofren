@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kickstarter Projects DEEPP — Case Study | Renaldy Bilal Setyawan</title>
+<meta name="description" content="Case study: exploratory data analysis of 375K+ Kickstarter campaigns (2009–2017) to identify the characteristics of successful projects, with a live Tableau dashboard, Python/Colab notebook, and investor recommendations.">
+<meta name="author" content="Renaldy Bilal Setyawan">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kickstarter Projects DEEPP — Case Study">
+<meta property="og:description" content="Exploratory data analysis of 375K+ Kickstarter campaigns (2009–2017): what makes a project succeed, and what investors should look for.">
+<meta property="og:url" content="https://renalazy.github.io/portofren/projects/deepp-kickstarter.html">
+<meta property="og:image" content="../assets/img/deepp-dashboard-preview.png">
+
+<link rel="icon" type="image/png" href="../assets/img/r.png">
+<link rel="apple-touch-icon" href="../assets/img/r.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<svg class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </symbol>
+  <symbol id="icon-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+    <polyline points="15 3 21 3 21 9"></polyline>
+    <line x1="10" y1="14" x2="21" y2="3"></line>
+  </symbol>
+</svg>
+
+<header class="site-header case-header">
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="../index.html" aria-label="Renaldy Bilal Setyawan — home">
+      <img src="../assets/img/r.png" alt="" width="26" height="26">
+      <span aria-hidden="true">RBS</span>
+    </a>
+    <a class="case-back" href="../index.html#projects">
+      <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
+      All projects
+    </a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ============================= CASE HERO ============================= -->
+  <section class="case-hero graph-paper">
+    <div class="wrap">
+      <span class="eyebrow">Case Study · Data Analytics</span>
+      <h1>Kickstarter Projects DEEPP</h1>
+      <p class="case-hero-sub">What separates a funded Kickstarter campaign from one that isn't? An exploratory data analysis of 375K+ campaigns (2009–2017) to identify the characteristics of successful projects — built for a prospective-investor audience.</p>
+      <p class="case-meta">RevoU Full-stack Data Analytics · 2024 · Renaldy Bilal Setyawan</p>
+
+      <div class="case-resource-links">
+        <a class="btn btn-secondary" href="../pdf/DEEPP_Renaldy_Bilal_Setyawan.pdf" target="_blank" rel="noopener">Slide deck (PDF)</a>
+        <a class="btn btn-secondary" href="https://colab.research.google.com/drive/19pok5FP40O9-pOL8I0jdtC37jlY3ss1j?usp=sharing" target="_blank" rel="noopener">Google Colab notebook</a>
+        <a class="btn btn-secondary" href="https://mavenanalytics.io/data-playground/kickstarter-projects" target="_blank" rel="noopener">Dataset</a>
+        <a class="btn btn-secondary" href="https://public.tableau.com/app/profile/renaldy.bilal.setyawan/viz/DEEPP_Kickstarter_Project/Dashboard1?publish=yes" target="_blank" rel="noopener">Tableau Public profile</a>
+      </div>
+
+      <figure class="case-hero-image">
+        <img src="../assets/img/deepp-dashboard-preview.png" alt="Tableau dashboard summarizing Kickstarter project trends, backers, categories, and top countries by success rate, 2009–2017" loading="eager">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================= OVERVIEW ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Overview</span>
+      <h2>Kickstarter, at a glance</h2>
+      <p class="case-lede">Kickstarter launched on 28 April 2009 and became a Public Benefit Corporation in 2015. It now spans 15+ project categories and subcategories. Figures below as of 28 April 2024.</p>
+      <div class="kpi-strip">
+        <div class="kpi-tile">
+          <span class="kpi-value">23,062,629</span>
+          <span class="kpi-label">total backers, platform-wide</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">$7.97B</span>
+          <span class="kpi-label">total dollars pledged, platform-wide</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">257,735</span>
+          <span class="kpi-label">total successfully funded projects</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PROBLEM & SCOPE ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Problem &amp; Scope</span>
+      <h2>What investors actually need to know</h2>
+      <div class="case-problem-grid">
+        <div class="case-problem-block">
+          <h3>Problem statement</h3>
+          <p>What are the characteristics of successful projects that investors should look for in potential future investments?</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Scope</h3>
+          <p>This project focuses on identifying Kickstarter projects from 2009–2017 for potential future investments.</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Objectives</h3>
+          <ul>
+            <li>Provide insights for investors on potential future successful projects and trends.</li>
+            <li>Identify the category with the highest success rate.</li>
+            <li>Identify the impact of backers and goal completion on project success.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= METHODOLOGY ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Methodology</span>
+      <h2>Objectives → gathering → cleaning → analysis → recommendation</h2>
+      <div class="method-steps">
+        <div class="method-step">
+          <div class="method-step-num">1</div>
+          <h4>Objectives</h4>
+          <p>Defining the problem and objectives for the project</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">2</div>
+          <h4>Gathering</h4>
+          <p>Conducting data gathering</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">3</div>
+          <h4>Cleaning</h4>
+          <p>Using Python for data cleaning processes</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">4</div>
+          <h4>Analysis</h4>
+          <p>Utilizing Python for analysis using EDA (Exploratory Data Analysis)</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">5</div>
+          <h4>Recommendation</h4>
+          <p>Develop actionable business recommendations</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= KEY FINDINGS ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Data Analysis</span>
+      <h2>Key findings</h2>
+      <p class="case-lede">Nine findings from the exploratory data analysis, each traced back to the underlying chart in the Tableau dashboard below.</p>
+
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">01</span>Success rates held <strong>stable from 2009–2013</strong>, then <strong>declined in 2014–2015</strong>, before <strong>recovering and stabilizing in 2016–2017</strong>.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Stable (2009–2013)</strong> ranging from 43% to 47%.</div>
+            <div class="stat-box"><strong>Declining (2014–2015)</strong> dropping to 32% in 2014, then 28% in 2015.</div>
+            <div class="stat-box"><strong>Recovering (2016–2017)</strong> rising back to 33% and 37%.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">02</span>The 2014–2015 decline traces to a drop in both <strong>number of backers</strong> and <strong>amount pledged</strong>.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Backers</strong> fell to averages of 96 (2014) and 99 (2015).</div>
+            <div class="stat-box"><strong>Pledged</strong> fell to averages of $7,935 (2014) and $9,059 (2015).</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">03</span>The 2016–2017 recovery coincided with a rebound in <strong>backer support</strong> and <strong>pledged amounts</strong>.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Backers</strong> rose to averages of 124 (2016) and 129 (2017).</div>
+            <div class="stat-box"><strong>Pledged</strong> rose to averages of $11,248 (2016) and $12,347 (2017).</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">04</span>There is a <strong>positive correlation</strong> between success rate and average number of backers — more backers tends to mean a higher success rate.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Up trends</strong> (2009–2011 &amp; 2015–2017) show backers rising alongside success rate.</div>
+            <div class="stat-box"><strong>Down trend</strong> (2013–2014) shows both falling together, from 43 to 33 average backers.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">05</span>Projects with a <strong>higher number of backers</strong> are more likely to succeed.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Successful</strong> projects average 204.1 backers — well above every other project state.</div>
+            <div class="stat-box">Suspended 105.3 · Live 68.1 · Cancelled 26.0 · Failed 16.4 average backers.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">06</span><strong>Music, Comic, and Dance</strong> subcategories post the highest success rates.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Music (Chiptune)</strong> — 77.14% success rate, the highest of any subcategory.</div>
+            <div class="stat-box"><strong>Comic (Anthologies)</strong> — 74.81%.</div>
+            <div class="stat-box"><strong>Dance (Residencies)</strong> — 72.46%.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">07</span><strong>Faster goal completion</strong> is associated with higher success rates.</p>
+          <div class="finding-stats">
+            <div class="stat-box">Success rate peaks for campaigns that hit their goal within a <strong>6–29 day</strong> window (54%–63%), well above the ~35–52% baseline for slower campaigns.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">08</span>Projects that <strong>meet their funding goal</strong> succeed at a dramatically higher rate — <strong>a 35+ point difference</strong> versus those that don't.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Goal completed</strong> (135,290 projects): 99.26% success rate.</div>
+            <div class="stat-box"><strong>Goal not completed</strong> (239,563 projects): 0.74% success rate.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">09</span>The <strong>United States, Hong Kong, United Kingdom, Denmark, and Singapore</strong> post the highest project success rates by country.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>United States</strong> — 37.59% success rate, 109,238 successful projects.</div>
+            <div class="stat-box"><strong>Hong Kong</strong> — 37.43% success rate, 216 successful projects.</div>
+            <div class="stat-box"><strong>United Kingdom · Denmark · Singapore</strong> — 36.16% / 34.03% / 32.90%, with 12,056 / 178 / 359 successful projects respectively.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= INSIGHT SUMMARY ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Insights</span>
+      <h2>Insight summary</h2>
+      <ul class="case-summary-list">
+        <li>Overall, Kickstarter success rates have stayed relatively stable over the years, with some fluctuation.</li>
+        <li>The 2014–2015 decline was likely driven by a <strong>decrease in both backers and pledged amounts</strong>, while the 2016–2017 recovery <strong>coincided with increased support</strong>.</li>
+        <li>Projects with a <strong>higher number of backers</strong> tend to have higher success rates — building a strong backer community matters.</li>
+        <li>Categories like <strong>Comic, Dance, and Music</strong> show consistently high success rates, reflecting their popularity among backers.</li>
+        <li><strong>Faster goal completion</strong> is a key success factor, suggesting the value of setting realistic, achievable funding goals.</li>
+        <li><strong>Meeting funding goals</strong> significantly raises the odds of success — careful planning and budgeting pay off.</li>
+        <li>The United States, United Kingdom, Hong Kong, Denmark, and Singapore lead in project success, reflecting global interest in crowdfunding.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================= RECOMMENDATIONS ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Recommendations</span>
+      <h2>Steps for choosing a potential project to invest in</h2>
+      <div class="reco-table">
+        <div class="reco-row">
+          <span class="reco-step">Step 01</span>
+          <span class="reco-title">Goal completion</span>
+          <span class="reco-desc">Completion of goals, in terms of both time and money, should be a focus — with particular attention to the amount of money pledged by the crowd.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 02</span>
+          <span class="reco-title">Number of backers</span>
+          <span class="reco-desc">Backers are the people who back or support the project — the higher the number of backers, the more likely the project is to succeed, since it already has demonstrated interest.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 03</span>
+          <span class="reco-title">Project category</span>
+          <span class="reco-desc">Based on prior-year data, select one of the top 5 subcategories from the most successful category.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 04</span>
+          <span class="reco-title">Country</span>
+          <span class="reco-desc">Select from the top 5 countries that produce the most successful projects.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= LIVE DASHBOARD ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Dashboard</span>
+      <h2>Explore the live Tableau dashboard</h2>
+      <p class="case-lede">Interactive version of the dashboard above — filter by year, category, or country to explore the underlying data yourself.</p>
+      <div class="tableau-embed-card">
+        <div class='tableauPlaceholder' id='viz1783470637339' style='position: relative'>
+          <noscript>
+            <a href='https://public.tableau.com/app/profile/renaldy.bilal.setyawan/viz/DEEPP_Kickstarter_Project/Dashboard1?publish=yes' target='_blank' rel='noopener'>
+              <img alt='Dashboard 1' src='https://public.tableau.com/static/images/DE/DEEPP_Kickstarter_Project/Dashboard1/1_rss.png' style='border: none' />
+            </a>
+          </noscript>
+          <object class='tableauViz' style='display:none;'>
+            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+            <param name='embed_code_version' value='3' />
+            <param name='site_root' value='' />
+            <param name='name' value='DEEPP_Kickstarter_Project&#47;Dashboard1' />
+            <param name='tabs' value='no' />
+            <param name='toolbar' value='yes' />
+            <param name='static_image' value='https://public.tableau.com/static/images/DE/DEEPP_Kickstarter_Project/Dashboard1/1.png' />
+            <param name='animate_transition' value='yes' />
+            <param name='display_static_image' value='yes' />
+            <param name='display_spinner' value='yes' />
+            <param name='display_overlay' value='yes' />
+            <param name='display_count' value='yes' />
+            <param name='language' value='en-US' />
+            <param name='filter' value='publish=yes' />
+          </object>
+        </div>
+        <script type='text/javascript'>
+          var divElement = document.getElementById('viz1783470637339');
+          var vizElement = divElement.getElementsByTagName('object')[0];
+          if (divElement.offsetWidth > 800) { vizElement.style.minWidth = '1200px'; vizElement.style.maxWidth = '100%'; vizElement.style.minHeight = '1527px'; vizElement.style.maxHeight = (divElement.offsetWidth * 0.75) + 'px'; }
+          else if (divElement.offsetWidth > 500) { vizElement.style.minWidth = '1200px'; vizElement.style.maxWidth = '100%'; vizElement.style.minHeight = '1527px'; vizElement.style.maxHeight = (divElement.offsetWidth * 0.75) + 'px'; }
+          else { vizElement.style.width = '100%'; vizElement.style.height = '2577px'; }
+          var scriptElement = document.createElement('script');
+          scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+          vizElement.parentNode.insertBefore(scriptElement, vizElement);
+        </script>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= RESOURCES ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Appendix</span>
+      <h2>Working files</h2>
+      <div class="resource-grid">
+        <a class="resource-card" href="../pdf/DEEPP_Renaldy_Bilal_Setyawan.pdf" target="_blank" rel="noopener">
+          <span class="resource-label">Slide deck</span>
+          <span class="resource-title">Full presentation (PDF) <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Overview, methodology, analysis, and recommendations as presented to RevoU.</span>
+        </a>
+        <a class="resource-card" href="https://colab.research.google.com/drive/19pok5FP40O9-pOL8I0jdtC37jlY3ss1j?usp=sharing" target="_blank" rel="noopener">
+          <span class="resource-label">Notebook</span>
+          <span class="resource-title">Google Colab <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Python data cleaning and EDA process, end to end.</span>
+        </a>
+        <a class="resource-card" href="https://mavenanalytics.io/data-playground/kickstarter-projects" target="_blank" rel="noopener">
+          <span class="resource-label">Dataset</span>
+          <span class="resource-title">Raw Kickstarter data <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Kickstarter campaigns, 2009–2017.</span>
+        </a>
+        <a class="resource-card" href="https://public.tableau.com/app/profile/renaldy.bilal.setyawan/viz/DEEPP_Kickstarter_Project/Dashboard1?publish=yes" target="_blank" rel="noopener">
+          <span class="resource-label">Dashboard</span>
+          <span class="resource-title">Tableau Public profile <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Standalone link to this dashboard on Tableau Public.</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© <span id="current-year">2026</span> Renaldy Bilal Setyawan. Static site, no backend.</span>
+    <div class="footer-links">
+      <a href="../index.html#projects">← All projects</a>
+      <a href="../index.html#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

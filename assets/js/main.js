@@ -1,74 +1,83 @@
-/* Renaldy Bilal Setyawan — Portfolio. Vanilla JS, no dependencies. */
+/* Renaldy Bilal Setyawan — Data Analyst Portfolio. Vanilla JS, no dependencies. */
 (function () {
-    "use strict";
+  "use strict";
 
-    /* Mobile nav toggle */
-    var navToggle = document.getElementById("navToggle");
-    var navMenu = document.getElementById("navMenu");
+  var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    if (navToggle && navMenu) {
-        navToggle.addEventListener("click", function () {
-            var isOpen = navMenu.classList.toggle("open");
-            navToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-        });
+  /* ---- Mobile nav toggle ---- */
+  var navToggle = document.querySelector(".nav-toggle");
+  var navLinks = document.querySelector(".nav-links");
 
-        navMenu.querySelectorAll(".nav-link").forEach(function (link) {
-            link.addEventListener("click", function () {
-                navMenu.classList.remove("open");
-                navToggle.setAttribute("aria-expanded", "false");
+  if (navToggle && navLinks) {
+    navToggle.addEventListener("click", function () {
+      var isOpen = navLinks.classList.toggle("is-open");
+      navToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    navLinks.querySelectorAll(".nav-link").forEach(function (link) {
+      link.addEventListener("click", function () {
+        navLinks.classList.remove("is-open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  /* ---- Scrollspy: highlight active nav link on scroll ---- */
+  var sections = document.querySelectorAll("main section[id]");
+  var navLinkMap = {};
+  document.querySelectorAll(".nav-link").forEach(function (link) {
+    var href = link.getAttribute("href");
+    if (href && href.startsWith("#")) {
+      navLinkMap[href.slice(1)] = link;
+    }
+  });
+
+  if (sections.length && "IntersectionObserver" in window) {
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          var link = navLinkMap[entry.target.id];
+          if (!link) return;
+          if (entry.isIntersecting) {
+            Object.keys(navLinkMap).forEach(function (id) {
+              navLinkMap[id].removeAttribute("aria-current");
             });
+            link.setAttribute("aria-current", "true");
+          }
         });
-    }
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 }
+    );
+    sections.forEach(function (section) {
+      observer.observe(section);
+    });
+  }
 
-    /* Active nav link highlighting on scroll */
-    var sections = Array.prototype.slice.call(document.querySelectorAll("main > section[id]"));
-    var navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-link"));
+  /* ---- Dynamic footer year ---- */
+  var yearEl = document.getElementById("current-year");
+  if (yearEl) {
+    yearEl.textContent = String(new Date().getFullYear());
+  }
 
-    function setActiveLink() {
-        var current = sections[0];
-        var headerOffset = 100;
+  /* ---- Mailto-based contact form (static site, no backend) ---- */
+  var contactForm = document.getElementById("contact-form");
+  if (contactForm) {
+    contactForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      var name = contactForm.elements["name"].value.trim();
+      var email = contactForm.elements["email"].value.trim();
+      var message = contactForm.elements["message"].value.trim();
 
-        sections.forEach(function (section) {
-            if (section.getBoundingClientRect().top - headerOffset <= 0) {
-                current = section;
-            }
-        });
+      var subject = encodeURIComponent("Portfolio contact from " + (name || "website visitor"));
+      var body = encodeURIComponent(
+        message + "\n\n---\nName: " + name + "\nEmail: " + email
+      );
+      window.location.href = "mailto:renaldybys@gmail.com?subject=" + subject + "&body=" + body;
+    });
+  }
 
-        navLinks.forEach(function (link) {
-            var matches = link.getAttribute("href") === "#" + current.id;
-            link.classList.toggle("active", matches);
-        });
-    }
-
-    if (sections.length && navLinks.length) {
-        window.addEventListener("scroll", setActiveLink, { passive: true });
-        setActiveLink();
-    }
-
-    /* Footer year */
-    var yearEl = document.getElementById("year");
-    if (yearEl) {
-        yearEl.textContent = new Date().getFullYear();
-    }
-
-    /* Contact form -> mailto (no backend on GitHub Pages) */
-    var contactForm = document.getElementById("contactForm");
-    if (contactForm) {
-        contactForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            var name = contactForm.querySelector("#name").value.trim();
-            var email = contactForm.querySelector("#email").value.trim();
-            var subject = contactForm.querySelector("#subject").value.trim();
-            var message = contactForm.querySelector("#message").value.trim();
-
-            var body = "From: " + name + " <" + email + ">\n\n" + message;
-            var mailto =
-                "mailto:renaldybys@gmail.com" +
-                "?subject=" + encodeURIComponent(subject) +
-                "&body=" + encodeURIComponent(body);
-
-            window.location.href = mailto;
-        });
-    }
+  /* ---- Respect prefers-reduced-motion for any future JS-driven motion ---- */
+  if (prefersReducedMotion) {
+    document.documentElement.classList.add("reduced-motion");
+  }
 })();
