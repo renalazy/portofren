@@ -343,11 +343,22 @@
       <div class="section-head">
         <span class="eyebrow">Projects</span>
         <h2>Real work, honestly labeled</h2>
-        <p>One analytics case study, plus three data-engineering integrations that move real institutional data day to day.</p>
+        <p>Two analytics case studies, plus three data-engineering integrations that move real institutional data day to day. Filter by stack to jump straight to relevant work.</p>
+      </div>
+
+      <div class="stack-filter" role="group" aria-label="Filter projects by stack">
+        <button type="button" class="stack-filter-btn is-active" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" class="stack-filter-btn" data-filter="excel" aria-pressed="false">Excel</button>
+        <button type="button" class="stack-filter-btn" data-filter="python" aria-pressed="false">Python</button>
+        <button type="button" class="stack-filter-btn" data-filter="tableau" aria-pressed="false">Tableau</button>
+        <button type="button" class="stack-filter-btn" data-filter="colab" aria-pressed="false">Google Colab</button>
+        <button type="button" class="stack-filter-btn" data-filter="nextjs" aria-pressed="false">Next.js</button>
+        <button type="button" class="stack-filter-btn" data-filter="golang" aria-pressed="false">Golang</button>
+        <button type="button" class="stack-filter-btn" data-filter="postgresql" aria-pressed="false">PostgreSQL</button>
       </div>
 
       <div class="projects-grid">
-        <article class="project-card is-real">
+        <article class="project-card is-real" data-stacks="python tableau colab">
           <span class="project-status status-real">Data Analytics</span>
           <img class="project-thumb" src="assets/img/deepp-dashboard-preview.png" alt="Tableau dashboard summarizing Kickstarter project success trends, backers, categories, and top countries, 2009–2017" loading="lazy">
           <h3>Kickstarter Projects DEEPP</h3>
@@ -356,7 +367,15 @@
           <a class="btn btn-secondary project-case-link" href="projects/deepp-kickstarter.html">View case study →</a>
         </article>
 
-        <article class="project-card is-real-eng">
+        <article class="project-card is-real" data-stacks="excel">
+          <span class="project-status status-real">Data Analytics</span>
+          <h3>Bike Buyers Sales Analysis</h3>
+          <p class="project-meta">Alex The Analyst — Data Analyst Bootcamp · 2026</p>
+          <p>Cleaned 1,026 raw customer records down to 1,000, then built pivot tables and charts on income, commute distance, and age bracket to find who actually buys a bike — packaged into a slicer-driven Excel dashboard.</p>
+          <a class="btn btn-secondary project-case-link" href="projects/excel-bike-buyers.html">View case study →</a>
+        </article>
+
+        <article class="project-card is-real-eng" data-stacks="nextjs golang postgresql">
           <span class="project-status status-engineering">Data Engineering</span>
           <h3>PDDIKTI Integration</h3>
           <p class="project-meta">Universitas PGRI Adi Buana Surabaya · Aug 2023 – Present</p>
@@ -365,7 +384,7 @@
           <p class="project-placeholder-note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
         </article>
 
-        <article class="project-card is-real-eng">
+        <article class="project-card is-real-eng" data-stacks="nextjs golang postgresql">
           <span class="project-status status-engineering">Data Engineering</span>
           <h3>SISTER Integration</h3>
           <p class="project-meta">Universitas PGRI Adi Buana Surabaya · Aug 2023 – Present</p>
@@ -374,7 +393,7 @@
           <p class="project-placeholder-note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
         </article>
 
-        <article class="project-card is-real-eng">
+        <article class="project-card is-real-eng" data-stacks="nextjs golang postgresql">
           <span class="project-status status-engineering">Data Engineering</span>
           <h3>Qontak Notification Engine</h3>
           <p class="project-meta">Universitas PGRI Adi Buana Surabaya · Aug 2023 – Present</p>

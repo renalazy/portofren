@@ -547,6 +547,30 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--grid-line);
 /* ==========================================================================
    Projects
    ========================================================================== */
+.stack-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+.stack-filter-btn {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  background: var(--bg-alt);
+  border: 1px solid var(--grid-line);
+  border-radius: 999px;
+  padding: 0.4rem 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.stack-filter-btn:hover { border-color: var(--series-primary); color: var(--ink); }
+.stack-filter-btn.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -623,6 +647,7 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--grid-line);
   color: var(--ink-faint);
   font-family: var(--font-mono);
 }
+.project-card.is-filtered-out { display: none; }
 
 @media (max-width: 720px) {
   .projects-grid { grid-template-columns: 1fr; }
@@ -911,6 +936,7 @@ details[open] .archived-summary::after { content: "–"; }
 }
 .method-step h4 { font-size: 0.9rem; margin-bottom: 0.25em; }
 .method-step p { font-size: 0.8rem; color: var(--ink-soft); }
+.method-steps.steps-4 { grid-template-columns: repeat(4, 1fr); }
 
 .finding-list { border-top: 1px solid var(--grid-line); }
 .finding {
@@ -1006,6 +1032,7 @@ details[open] .archived-summary::after { content: "–"; }
 
 @media (max-width: 900px) {
   .method-steps { grid-template-columns: repeat(3, 1fr); row-gap: 1.75rem; }
+  .method-steps.steps-4 { grid-template-columns: repeat(2, 1fr); }
   .resource-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 720px) {

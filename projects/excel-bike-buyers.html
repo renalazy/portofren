@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bike Buyers Sales Analysis — Excel Case Study | Renaldy Bilal Setyawan</title>
+<meta name="description" content="Case study: cleaning, pivot tables, charts, and a slicer-driven dashboard built in Excel on a 1,000-record bike-buyer dataset, following Alex The Analyst's Data Analyst Bootcamp.">
+<meta name="author" content="Renaldy Bilal Setyawan">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bike Buyers Sales Analysis — Excel Case Study">
+<meta property="og:description" content="Cleaning, pivot tables, charts, and a slicer-driven dashboard in Excel: who actually buys a bike, and why.">
+<meta property="og:url" content="https://renalazy.github.io/portofren/projects/excel-bike-buyers.html">
+<meta property="og:image" content="../assets/img/r.png">
+
+<link rel="icon" type="image/png" href="../assets/img/r.png">
+<link rel="apple-touch-icon" href="../assets/img/r.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<svg class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </symbol>
+  <symbol id="icon-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+    <polyline points="15 3 21 3 21 9"></polyline>
+    <line x1="10" y1="14" x2="21" y2="3"></line>
+  </symbol>
+  <symbol id="icon-youtube" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 8.4v7.2a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V8.4a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3z"></path>
+    <polygon points="10 9 15 12 10 15 10 9" fill="currentColor" stroke="none"></polygon>
+  </symbol>
+  <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+    <polyline points="7 10 12 15 17 10"></polyline>
+    <line x1="12" y1="15" x2="12" y2="3"></line>
+  </symbol>
+</svg>
+
+<header class="site-header case-header">
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="../index.html" aria-label="Renaldy Bilal Setyawan — home">
+      <img src="../assets/img/r.png" alt="" width="26" height="26">
+      <span aria-hidden="true">RBS</span>
+    </a>
+    <a class="case-back" href="../index.html#projects">
+      <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
+      All projects
+    </a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ============================= CASE HERO ============================= -->
+  <section class="case-hero graph-paper">
+    <div class="wrap">
+      <span class="eyebrow">Case Study · Excel Analytics</span>
+      <h1>Bike Buyers Sales Analysis</h1>
+      <p class="case-hero-sub">Who actually buys a bike, and what separates them from the customers who don't? A ground-up Excel workflow — clean the raw export, pivot it three ways, chart each pivot, then wire the whole thing into a single filterable dashboard.</p>
+      <p class="case-meta">Alex The Analyst — Data Analyst Bootcamp (Excel module) · 2026 · Renaldy Bilal Setyawan</p>
+
+      <div class="case-resource-links">
+        <a class="btn btn-secondary" href="https://www.youtube.com/watch?v=opJgMj1IUrc&amp;list=PLUaB-1hjhk8FE_XZ87vPPSfHqb6OcM0cF" target="_blank" rel="noopener">
+          <svg class="icon" aria-hidden="true"><use href="#icon-youtube"></use></svg>
+          Watch the tutorial series
+        </a>
+        <a class="btn btn-secondary" href="../files/Bike_Buyers_Renaldy_Bilal_Setyawan.xlsx" download>
+          <svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg>
+          Download the workbook (.xlsx)
+        </a>
+      </div>
+
+      <p class="project-placeholder-note">Screenshot of the finished dashboard isn't embedded yet — download the workbook above to see the bike_buyers → Working Sheets → Pivot Tables → Dashboard sheets directly.</p>
+    </div>
+  </section>
+
+  <!-- ============================= OVERVIEW ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Overview</span>
+      <h2>The dataset, at a glance</h2>
+      <p class="case-lede">A raw customer export from a bike retailer: demographics, income, commute distance, and whether each customer purchased a bike — one row per customer.</p>
+      <div class="kpi-strip">
+        <div class="kpi-tile">
+          <span class="kpi-value">1,026</span>
+          <span class="kpi-label">raw customer rows in the original export</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">26</span>
+          <span class="kpi-label">duplicate rows removed during cleaning</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">1,000</span>
+          <span class="kpi-label">clean, deduplicated rows carried into analysis</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">48.1%</span>
+          <span class="kpi-label">of customers purchased a bike (481 of 1,000)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PROBLEM & SCOPE ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Problem &amp; Scope</span>
+      <h2>What the sales team actually needs to know</h2>
+      <div class="case-problem-grid">
+        <div class="case-problem-block">
+          <h3>Problem statement</h3>
+          <p>Which customer traits — income, commute distance, age — actually separate bike buyers from non-buyers, so marketing can target the right segment instead of guessing?</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Scope</h3>
+          <p>A single retailer export of 1,026 customer records (marital status, gender, income, education, occupation, home ownership, cars, commute distance, region, age, and purchase outcome), cleaned down to 1,000 usable rows.</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Objectives</h3>
+          <ul>
+            <li>Standardize inconsistent raw fields before any analysis touches them.</li>
+            <li>Pivot the clean data by gender, commute distance, and age bracket to see where purchase rates differ.</li>
+            <li>Package the findings into a dashboard a non-technical stakeholder can filter themselves.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= METHODOLOGY ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Methodology</span>
+      <h2>Cleaning → pivot tables → charts → dashboard</h2>
+      <p class="case-lede">The four-step Excel workflow taught in Alex The Analyst's Data Analyst Bootcamp, applied end to end on this dataset.</p>
+      <div class="method-steps steps-4">
+        <div class="method-step">
+          <div class="method-step-num">1</div>
+          <h4>Data Cleaning</h4>
+          <p>Remove duplicates; standardize categorical shorthand and currency formatting</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">2</div>
+          <h4>Pivot Tables</h4>
+          <p>Average income, commute distance, and age bracket, each against purchase outcome</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">3</div>
+          <h4>Charts</h4>
+          <p>One chart per pivot table, built to sit directly on the dashboard</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">4</div>
+          <h4>Dashboard</h4>
+          <p>Slicers for marital status, region, education, and occupation tie every chart together</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= DATA CLEANING ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Step 1</span>
+      <h2>Data cleaning</h2>
+      <p class="case-lede">Nothing gets pivoted until the raw export is trustworthy and readable. Three fixes, each with a reason behind it.</p>
+      <div class="case-problem-grid">
+        <div class="case-problem-block">
+          <h3>Remove duplicates</h3>
+          <p>Excel's built-in duplicate check flagged 26 repeated customer rows out of 1,026. Left in, they'd double-count those customers in every pivot table and quietly skew the average-income and purchase-rate numbers below.</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Standardize categories</h3>
+          <p>Marital Status arrived as raw <code>M</code> / <code>S</code> codes, and Gender as <code>M</code> / <code>F</code>. Spelled out as Married/Single and Male/Female, the pivot tables, charts, and dashboard slicers below are self-explanatory to anyone reading the file — no data dictionary required.</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Format currency</h3>
+          <p>Income came in as plain integers (e.g. <code>40000</code>). Formatting the column as currency turns every pivot table and chart that touches income into something that reads like a business report on first glance, not a raw data dump.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= KEY FINDINGS ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Steps 2 &amp; 3 · Pivot Tables + Charts</span>
+      <h2>Key findings</h2>
+      <p class="case-lede">Three pivot tables, each charted, each answering one question about what separates a buyer from a non-buyer.</p>
+
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">01</span>Buyers out-earn non-buyers on average, for <strong>both genders</strong> — the income gap holds regardless of who's buying.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Female</strong> — non-buyers average $53,440 vs. $55,774 for buyers.</div>
+            <div class="stat-box"><strong>Male</strong> — non-buyers average $56,208 vs. $60,124 for buyers.</div>
+            <div class="stat-box"><strong>Overall</strong> — buyers average $57,963 vs. $54,875 for non-buyers, a $3,088 gap.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">02</span>Purchase rate doesn't fall in a straight line with commute distance — it <strong>peaks at short-to-medium commutes</strong> and drops hard past 10 miles.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>2–5 miles</strong> — 95 of 162 customers bought a bike, a 58.6% rate — the highest of any bracket.</div>
+            <div class="stat-box"><strong>0–1 miles</strong> — 200 of 366 customers, a 54.6% rate — the largest buyer segment by volume.</div>
+            <div class="stat-box"><strong>More than 10 miles</strong> — just 33 of 111 customers, a 29.7% rate — the lowest of any bracket.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">03</span><strong>Middle-aged customers</strong> are both the largest segment in the dataset and the most likely to buy.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Middle Age</strong> — 701 of the 1,000 customers, buying at a 54.6% rate (383 of 701).</div>
+            <div class="stat-box"><strong>Adolescent</strong> — 110 customers, buying at a 35.5% rate (39 of 110).</div>
+            <div class="stat-box"><strong>Old</strong> — 189 customers, buying at just a 31.2% rate (59 of 189) — the lowest of any bracket.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= DASHBOARD ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Step 4</span>
+      <h2>Dashboard &amp; slicers</h2>
+      <p class="case-lede">The three charts above sit on one dashboard sheet, connected to four slicers — the piece that turns a static report into something a sales or marketing lead can explore without touching a formula.</p>
+      <div class="case-problem-grid">
+        <div class="case-problem-block">
+          <h3>Why slicers, not filters</h3>
+          <p>A slicer is a visible, clickable button panel instead of a hidden dropdown — connected to all three pivot charts at once, so one click re-slices income, commute, and age bracket together.</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>What's wired in</h3>
+          <ul>
+            <li>Marital Status</li>
+            <li>Region</li>
+            <li>Education</li>
+            <li>Occupation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= INSIGHT SUMMARY ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Insights</span>
+      <h2>Insight summary</h2>
+      <ul class="case-summary-list">
+        <li><strong>Income correlates with purchase</strong> for both genders — buyers average roughly $3,000 more per year than non-buyers.</li>
+        <li><strong>Commute distance is non-linear</strong> — the sweet spot for bike purchases is a 0–5 mile commute, not the shortest or longest bracket.</li>
+        <li><strong>Middle-aged customers</strong> are both the biggest segment and the highest-converting one, while older customers convert the least.</li>
+        <li>The <strong>dashboard's slicers</strong> (marital status, region, education, occupation) let these three findings be re-cut on demand, without opening a new pivot table.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================= RECOMMENDATIONS ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Recommendations</span>
+      <h2>Where to focus the next marketing push</h2>
+      <div class="reco-table">
+        <div class="reco-row">
+          <span class="reco-step">Step 01</span>
+          <span class="reco-title">Commute distance</span>
+          <span class="reco-desc">Prioritize customers with a 0–5 mile commute — this range converts at 54.6%–58.6%, versus 29.7% for commutes over 10 miles.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 02</span>
+          <span class="reco-title">Age bracket</span>
+          <span class="reco-desc">Lead with the Middle Age bracket — it's 701 of the 1,000 customers and converts at 54.6%, the highest of any age group.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 03</span>
+          <span class="reco-title">Income tier</span>
+          <span class="reco-desc">Buyers skew to higher income across the board — worth testing pricing or bundling that targets the upper-income half of the customer base.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 04</span>
+          <span class="reco-title">Keep the slicers live</span>
+          <span class="reco-desc">Use the marital status, region, education, and occupation slicers to re-test these findings as new sales data comes in, instead of rebuilding the pivots from scratch.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= RESOURCES ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Appendix</span>
+      <h2>Working files</h2>
+      <div class="resource-grid">
+        <a class="resource-card" href="../files/Bike_Buyers_Renaldy_Bilal_Setyawan.xlsx" download>
+          <span class="resource-label">Workbook</span>
+          <span class="resource-title">Full Excel file (.xlsx) <svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg></span>
+          <span class="resource-desc">Raw data, cleaning, all three pivot tables, charts, and the finished dashboard — every sheet.</span>
+        </a>
+        <a class="resource-card" href="https://www.youtube.com/watch?v=opJgMj1IUrc&amp;list=PLUaB-1hjhk8FE_XZ87vPPSfHqb6OcM0cF" target="_blank" rel="noopener">
+          <span class="resource-label">Tutorial</span>
+          <span class="resource-title">Alex The Analyst — Excel module <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">The exact bootcamp walkthrough this project follows, from cleaning to dashboard.</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© <span id="current-year">2026</span> Renaldy Bilal Setyawan. Static site, no backend.</span>
+    <div class="footer-links">
+      <a href="../index.html#projects">← All projects</a>
+      <a href="../index.html#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

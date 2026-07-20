@@ -76,6 +76,32 @@
     });
   }
 
+  /* ---- Stack filter for Projects section ---- */
+  var stackFilter = document.querySelector(".stack-filter");
+  var projectCards = document.querySelectorAll(".projects-grid .project-card");
+
+  if (stackFilter && projectCards.length) {
+    var filterButtons = stackFilter.querySelectorAll(".stack-filter-btn");
+
+    filterButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        filterButtons.forEach(function (btn) {
+          btn.classList.remove("is-active");
+          btn.setAttribute("aria-pressed", "false");
+        });
+        button.classList.add("is-active");
+        button.setAttribute("aria-pressed", "true");
+
+        var stack = button.getAttribute("data-filter");
+        projectCards.forEach(function (card) {
+          var stacks = (card.getAttribute("data-stacks") || "").split(" ");
+          var matches = stack === "all" || stacks.indexOf(stack) !== -1;
+          card.classList.toggle("is-filtered-out", !matches);
+        });
+      });
+    });
+  }
+
   /* ---- Respect prefers-reduced-motion for any future JS-driven motion ---- */
   if (prefersReducedMotion) {
     document.documentElement.classList.add("reduced-motion");
