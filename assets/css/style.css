@@ -264,7 +264,7 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--grid-line);
   align-items: center;
   gap: 0.4rem;
 }
-.hero-cta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
 
 .btn {
   display: inline-flex;
@@ -293,11 +293,11 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--grid-line);
   border-color: var(--ink);
 }
 .btn-note {
-  display: block;
+  flex: 0 0 100%;
   font-family: var(--font-mono);
   font-size: 0.7rem;
   color: var(--ink-faint);
-  margin-top: 0.35rem;
+  margin-top: -0.65rem; /* trim the flex gap so the note hugs the buttons */
 }
 
 /* ---- KPI dashboard strip (signature element) ---- */
@@ -693,6 +693,11 @@ section.alt { background: var(--bg-alt); border-top: 1px solid var(--grid-line);
   font-size: 0.8rem;
   color: var(--ink-faint);
   margin-bottom: 0.9rem;
+}
+.timeline-summary {
+  color: var(--ink-soft);
+  font-size: 0.925rem;
+  margin-bottom: 0.8rem;
 }
 .timeline-bullets li {
   position: relative;
