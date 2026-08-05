@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gayanara E-Commerce — Performance Review | Renaldy Bilal Setyawan</title>
+<meta name="description" content="Case study: end-to-end analytics on a synthetic Indonesian fashion e-commerce dataset (10,586 rows, 5 tables) — data quality audit, SQL modeling in DuckDB, exploratory analysis, Tableau dashboard, and a stakeholder deck.">
+<meta name="author" content="Renaldy Bilal Setyawan">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gayanara E-Commerce — Performance Review">
+<meta property="og:description" content="A full analyst loop on a synthetic Indonesian fashion e-commerce dataset: audit → EDA → SQL modeling → BI dashboard → stakeholder deck.">
+<meta property="og:url" content="https://renalazy.github.io/portofren/projects/gayanara-ecommerce.html">
+<meta property="og:image" content="../assets/img/gayanara/gayanara-dashboard-preview.png">
+
+<link rel="icon" type="image/png" href="../assets/img/r.png">
+<link rel="apple-touch-icon" href="../assets/img/r.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../assets/css/style.css?v=2">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<svg class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </symbol>
+  <symbol id="icon-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+    <polyline points="15 3 21 3 21 9"></polyline>
+    <line x1="10" y1="14" x2="21" y2="3"></line>
+  </symbol>
+</svg>
+
+<header class="site-header case-header">
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="../index.html" aria-label="Renaldy Bilal Setyawan — home">
+      <img src="../assets/img/r.png" alt="" width="26" height="26">
+      <span aria-hidden="true">RBS</span>
+    </a>
+    <a class="case-back" href="../index.html#projects">
+      <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
+      All projects
+    </a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ============================= CASE HERO ============================= -->
+  <section class="case-hero graph-paper">
+    <div class="wrap">
+      <span class="eyebrow">Case Study · Data Analytics</span>
+      <h1>Gayanara E-Commerce — Performance Review</h1>
+      <p class="case-hero-sub">A full analyst loop on a five-table Indonesian fashion e-commerce dataset: audit the data before trusting it, model revenue in SQL, read the findings honestly, and hand a stakeholder something they can act on. The dataset is <strong>synthetically generated</strong> — this page demonstrates workflow and judgment, not real business conclusions.</p>
+      <p class="case-meta">Self-directed · 2025 · Renaldy Bilal Setyawan</p>
+      <p class="case-stack-line">DuckDB · JupySQL (<code>%%sql</code>) · Python (pandas) · Tableau Public</p>
+
+      <div class="case-resource-links">
+        <a class="btn btn-secondary" href="../pdf/Gayanara_Performance_Review.pdf" target="_blank" rel="noopener">Slide deck (PDF)</a>
+        <a class="btn btn-secondary" href="https://github.com/renalazy/gayanara-ecommerce" target="_blank" rel="noopener">GitHub repo</a>
+        <a class="btn btn-secondary" href="https://public.tableau.com/shared/4BX3MHD2Z?:display_count=n&amp;:origin=viz_share_link" target="_blank" rel="noopener">Tableau dashboard</a>
+        <a class="btn btn-secondary" href="https://ngulikdata.com/" target="_blank" rel="noopener">Dataset (NgulikData)</a>
+      </div>
+
+      <figure class="case-hero-image">
+        <img src="../assets/img/gayanara/gayanara-dashboard-preview.png" alt="Tableau dashboard for Gayanara e-commerce: revenue, completed orders and AOV KPI cards, monthly net revenue trend, top cities, promo impact, courier rates, customer segments, and retention curve" loading="eager">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================= OVERVIEW ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Overview</span>
+      <h2>The headline numbers</h2>
+      <p class="case-lede">Every figure below is computed from one revenue definition that reconciles to the rupiah against the source orders table. The three KPI cards on the dashboard tie to each other exactly: Rp 1,265,340,379 ÷ 2,521 orders = Rp 501,920.</p>
+      <div class="kpi-strip">
+        <div class="kpi-tile">
+          <span class="kpi-value">Rp 1.27B</span>
+          <span class="kpi-label">net revenue, Jan 2022 – Feb 2025</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">2,521</span>
+          <span class="kpi-label">completed orders (excl. cancelled &amp; returned)</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">Rp 501,920</span>
+          <span class="kpi-label">average order value</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">5,442</span>
+          <span class="kpi-label">units sold across 6 clean categories</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-value">10,586</span>
+          <span class="kpi-label">source rows across 5 relational tables</span>
+        </div>
+      </div>
+
+      <div class="case-callout">
+        <h3>About this dataset</h3>
+        <p>Gayanara is a <strong>synthetically generated</strong> dataset published by NgulikData. It is used here to demonstrate the analytical workflow — auditing, SQL modeling, segmentation, and BI delivery — not to produce real business conclusions. Two findings on this page (flat category revenue, flat retention) are artifacts of the data generator rather than business signal, and are labelled as such where they appear.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PROBLEM & SCOPE ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Problem &amp; Scope</span>
+      <h2>What a fashion retailer would actually ask</h2>
+      <div class="case-problem-grid">
+        <div class="case-problem-block">
+          <h3>Problem statement</h3>
+          <p>Where is revenue coming from, which customers are worth re-engaging, and are the levers the business already pulls — discounts and courier choice — doing what management thinks they do?</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Scope</h3>
+          <p>Five tables, 10,586 rows, orders from January 2022 to February 2025. All revenue work excludes cancelled and returned orders; shipping is excluded as a pass-through cost.</p>
+        </div>
+        <div class="case-problem-block">
+          <h3>Objectives</h3>
+          <ul>
+            <li>Establish a single revenue definition that reconciles to source before reporting anything.</li>
+            <li>Quantify growth and say whether it is volume-led or price-led.</li>
+            <li>Segment the customer base into tiers marketing can export and act on.</li>
+            <li>Test whether promo codes lift basket size, and whether any courier underperforms.</li>
+            <li>Deliver a dashboard and a deck that state their own limits.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= DATASET ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Data</span>
+      <h2>Five tables, deliberately messy</h2>
+      <p class="case-lede">The dataset ships with the kind of problems a real extract has: duplicate email addresses, product categories written in a mix of Indonesian and English with inconsistent casing, and missing review text. That is the point — the audit is the first phase, not an afterthought.</p>
+      <div class="case-table-wrap">
+        <table class="case-table">
+          <thead>
+            <tr><th>Table</th><th class="num">Rows</th><th>Grain</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>customers</strong></td><td class="num">800</td><td>one row per customer account</td></tr>
+            <tr><td><strong>orders</strong></td><td class="num">3,000</td><td>one row per order</td></tr>
+            <tr><td><strong>order_items</strong></td><td class="num">4,986</td><td>one row per product line</td></tr>
+            <tr><td><strong>products</strong></td><td class="num">300</td><td>one row per SKU</td></tr>
+            <tr><td><strong>reviews</strong></td><td class="num">1,500</td><td>one row per review</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="case-lede">Raw CSVs are loaded into a local DuckDB database with <code>read_csv_auto</code> and queried through JupySQL's <code>%%sql</code> magic — full SQL against a real engine, no standalone server, and the notebook stays readable as SQL rather than as pandas chaining.</p>
+    </div>
+  </section>
+
+  <!-- ============================= METHODOLOGY ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Methodology</span>
+      <h2>Audit → exploration → dashboard → stakeholder deck</h2>
+      <div class="method-steps steps-4">
+        <div class="method-step">
+          <div class="method-step-num">1</div>
+          <h4>Data quality audit</h4>
+          <p>Nulls, duplicates, category standardization, referential integrity — before any metric is quoted</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">2</div>
+          <h4>Exploratory analysis</h4>
+          <p>Seven analytical tasks in SQL, from revenue trend to cohort retention</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">3</div>
+          <h4>Dashboard</h4>
+          <p>Seven views published to Tableau Public on pre-aggregated CSV extracts</p>
+        </div>
+        <div class="method-step">
+          <div class="method-step-num">4</div>
+          <h4>Stakeholder deck</h4>
+          <p>12 slides, including a dedicated slide on what the analysis cannot tell us</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= METRIC DEFINITIONS ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Definitions</span>
+      <h2>One revenue definition, reconciled to source</h2>
+      <p class="case-lede">The most common way an analytics deliverable loses credibility is three KPIs computed three different ways. These five definitions are fixed once and used everywhere — in the notebooks, the dashboard, and the deck.</p>
+      <div class="case-table-wrap">
+        <table class="case-table">
+          <thead>
+            <tr><th>Metric</th><th>Definition</th><th class="num">Value</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Gross revenue</strong></td>
+              <td><code>SUM(order_items.subtotal_idr)</code>, excluding cancelled and returned orders</td>
+              <td class="num">Rp 1,296,768,000</td>
+            </tr>
+            <tr>
+              <td><strong>Net revenue</strong></td>
+              <td>Gross revenue less order-level discounts</td>
+              <td class="num">Rp 1,265,340,379</td>
+            </tr>
+            <tr>
+              <td><strong>Completed orders</strong></td>
+              <td>Orders not cancelled and not returned</td>
+              <td class="num">2,521</td>
+            </tr>
+            <tr>
+              <td><strong>Average order value</strong></td>
+              <td>Net revenue ÷ completed orders</td>
+              <td class="num">Rp 501,920</td>
+            </tr>
+            <tr>
+              <td><strong>Units sold</strong></td>
+              <td><code>SUM(order_items.quantity)</code></td>
+              <td class="num">5,442</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="case-callout is-primary">
+        <h3>Two decisions worth stating</h3>
+        <ul>
+          <li><strong>Net revenue reconciles to the rupiah</strong> against <code>orders.total_amount_idr</code>. If it didn't, the discount logic would be wrong somewhere.</li>
+          <li><strong>Shipping is excluded</strong> as a pass-through cost, and <strong>category revenue is reported gross</strong> — order-level discounts cannot be attributed down to individual line items, so category figures sum to Rp 1,296.8M rather than the Rp 1,265.3M headline. The two reconcile exactly; the gap is the Rp 31.4M of discounts.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PHASE 1 ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Phase 1 · Data Quality Audit</span>
+      <h2>Four checks before any number is quoted</h2>
+      <p class="case-lede">Notebook <code>01_Data_Quality_Audit.ipynb</code>. Each check ends in a decision, and each decision is written down — including the one where the answer was "leave it alone."</p>
+
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">01</span><span class="case-step-label">Null audit</span>Missing values are concentrated in three columns, and only one of them constrains anything.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>customers.phone</strong> — 5.0% missing (40 rows). The only material gap: it rules those customers out of any SMS campaign. Email-led campaigns are unaffected.</div>
+            <div class="stat-box"><strong>products.material</strong> — 3.0% missing (9 rows). Low impact; needs a default label in product-mix breakdowns.</div>
+            <div class="stat-box"><strong>reviews.review_text</strong> — 8.0% missing (120 rows). Normal user behaviour — people leave a star rating without writing anything. Not a data defect.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">02</span><span class="case-step-label">Duplicate customers</span>Three email addresses map to two <code>customer_id</code>s each — and I deliberately did <strong>not</strong> merge them.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Scale:</strong> 6 of 800 customer records, 0.75% of the base.</div>
+            <div class="stat-box"><strong>Decision:</strong> <code>customer_id</code> is retained as the analytical grain, preserving the source system's own definition of a customer. Merging on email would silently invent a different entity than the one the business transacts with.</div>
+            <div class="stat-box"><strong>Follow-up:</strong> flagged for upstream data engineering as an account-creation issue. Documented here as an explicit decision rather than left to look like an oversight.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">03</span><span class="case-step-label">Category standardization</span>Fourteen distinct category values collapse to six real ones.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>The mess:</strong> mixed Indonesian and English terms (<em>Aksesoris</em> vs <em>Accessories</em>) plus inconsistent casing (<em>Dress</em> vs <em>dress</em>). Left alone, every category revenue figure would be split across duplicate buckets.</div>
+            <div class="stat-box"><strong>The fix:</strong> a <code>CASE WHEN</code> mapping to six clean categories — Jacket, Pants, Accessories, Dress, Shirt, T-Shirt — persisted as a new <code>products.category_clean</code> column so downstream queries never re-derive it.</div>
+          </div>
+        </div>
+
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">04</span><span class="case-step-label">Referential integrity</span>Zero orphaned rows — which is what makes the rest of the analysis safe.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>0 of 4,986</strong> <code>order_items</code> rows fail to match a <code>products</code> row.</div>
+            <div class="stat-box"><strong>Why it matters:</strong> this is the check that licenses <code>INNER JOIN</code> for all revenue work. Without it, every product-level join would silently drop sales and no total would tie out.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PHASE 2 ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Phase 2 · Exploratory Analysis</span>
+      <h2>Seven questions, seven answers</h2>
+      <p class="case-lede">Notebook <code>02_Exploratory_Data_Analysis_EDA.ipynb</code>. Each task below states the business question, the approach — including where the obvious approach would have been wrong — and the finding.</p>
+
+      <!-- Task 1 -->
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">01</span><span class="case-step-label">Revenue trends</span>Revenue roughly tripled over three years, and the growth is <strong>volume-led, not price-led</strong>.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Question:</strong> what is total net revenue, and how are order volume and AOV trending?</div>
+            <div class="stat-box"><strong>Approach:</strong> a CTE aggregates to <em>order level first</em>, then joins. <code>discount_amount_idr</code> lives on the order, so joining straight to <code>order_items</code> would multiply the discount once per line item and understate net revenue on every multi-item order.</div>
+            <div class="stat-box"><strong>Finding:</strong> monthly net revenue grew from Rp 21.8M (Jan 2022) to Rp 66.3M (Feb 2025), roughly 3×. Orders rose from ~32 to 100+ per month. AOV showed no directional trend at all, fluctuating between Rp 390K and Rp 610K throughout.</div>
+            <div class="stat-box"><strong>So what:</strong> the business is growing by acquiring more orders, not by getting more out of each one. Anything aimed at lifting basket size is untested territory — which sets up Task 5.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-code">WITH order_gross AS (
+    -- Aggregate to order level FIRST, so the order-level
+    -- discount is not multiplied once per line item
+    SELECT
+        o.order_id,
+        STRFTIME(o.order_date, '%Y-%m')          AS order_month,
+        SUM(oi.quantity)                         AS units,
+        SUM(oi.subtotal_idr)                     AS gross_revenue,
+        MAX(COALESCE(o.discount_amount_idr, 0))  AS discount
+    FROM orders o
+    JOIN order_items oi ON o.order_id = oi.order_id
+    WHERE o.order_status NOT IN ('cancelled', 'returned')
+    GROUP BY o.order_id, order_month, o.discount_amount_idr
+)
+SELECT
+    order_month,
+    COUNT(DISTINCT order_id)                  AS total_orders,
+    SUM(units)                                AS total_units_sold,
+    SUM(gross_revenue) - SUM(discount)        AS net_revenue,
+    CAST((SUM(gross_revenue) - SUM(discount))
+         / COUNT(DISTINCT order_id) AS BIGINT) AS net_aov
+FROM order_gross
+GROUP BY order_month
+ORDER BY order_month;</div>
+
+      <figure class="case-figure">
+        <img src="../assets/img/gayanara/monthly-net-revenue.png" alt="Line chart of monthly net revenue from January 2022 to February 2025, trending upward from roughly Rp 22M to Rp 66M per month" loading="lazy">
+        <figcaption>Monthly net revenue, Jan 2022 – Feb 2025. The trend is up; the AOV line behind it is flat.</figcaption>
+      </figure>
+
+      <!-- Task 2 -->
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">02</span><span class="case-step-label">Category performance</span>Jackets lead on both units and revenue despite having the <em>lowest</em> average unit price.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Question:</strong> which categories drive volume, and which drive revenue?</div>
+            <div class="stat-box"><strong>Finding:</strong> Jackets top units sold (1,026) and gross revenue (Rp 224.0M) at the lowest average unit price of the six (Rp 218K) — a purely volume-driven lead. Shirts carry the highest unit price (Rp 263K) but rank 5th in revenue.</div>
+            <div class="stat-box"><strong>Caveat, stated up front:</strong> all six categories fall within 14% of each other in revenue. Real apparel catalogs are far more concentrated than that. This flatness is a generator artifact, so the category ranking should not be read as a merchandising signal.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-table-wrap">
+        <table class="case-table">
+          <thead>
+            <tr><th>Category</th><th class="num">Units sold</th><th class="num">Gross revenue</th><th class="num">Avg unit price</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Jacket</strong></td><td class="num">1,026</td><td class="num">Rp 223,984,000</td><td class="num">Rp 218,308</td></tr>
+            <tr><td>Pants</td><td class="num">896</td><td class="num">Rp 221,044,000</td><td class="num">Rp 246,701</td></tr>
+            <tr><td>Accessories</td><td class="num">971</td><td class="num">Rp 219,999,000</td><td class="num">Rp 226,570</td></tr>
+            <tr><td>Dress</td><td class="num">874</td><td class="num">Rp 219,546,000</td><td class="num">Rp 251,197</td></tr>
+            <tr><td>Shirt</td><td class="num">824</td><td class="num">Rp 216,616,000</td><td class="num">Rp 262,883</td></tr>
+            <tr><td>T-Shirt</td><td class="num">851</td><td class="num">Rp 195,579,000</td><td class="num">Rp 229,823</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Task 3 -->
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">03</span><span class="case-step-label">RFM segmentation</span>The headline isn't the segment sizes — it's that the median customer hasn't bought in <strong>145 days</strong>.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Approach:</strong> fixed business-rule thresholds on recency, frequency and monetary value, benchmarked against the observed distribution (median recency 145 days, median frequency 4 orders, median lifetime spend Rp 1.69M, p90 frequency 6, p90 spend Rp 3.66M). Rules, not clusters — chosen for interpretability, since marketing has to be able to explain the list they're exporting.</div>
+            <div class="stat-box"><strong>Segments (787 customers):</strong> Champions 26 · Regulars 269 · At Risk (VIPs) 135 · New/Promising 14 · Lost/Inactive 343.</div>
+            <div class="stat-box"><strong>Honest caveat:</strong> the "Lost" cutoff of 120 days sits <em>below</em> the median recency of 145 days, so by construction more than half the base lands there. The segment is large partly because of where I drew the line — a 180-day cutoff would tell a calmer story about the same customers.</div>
+            <div class="stat-box"><strong>So what:</strong> dormancy is the default state of this base, not an edge case. The actionable slice is the 135 At Risk (VIPs) — high spenders who have gone quiet, including the single highest-spending customer at 129 days without a purchase.</div>
+          </div>
+        </div>
+
+        <!-- Task 4 -->
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">04</span><span class="case-step-label">Geography</span>Revenue is spread evenly across cities — but encoding AOV as colour surfaces one outlier.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Top five by revenue:</strong> Semarang Rp 77M · Depok Rp 76M · Medan Rp 75M · Bekasi Rp 70M · Manado Rp 69M.</div>
+            <div class="stat-box"><strong>The design choice that earns its keep:</strong> the dashboard colours each city by AOV rather than revenue. That immediately exposes <strong>Bekasi</strong> — 4th in total revenue, but the lowest AOV of the top five (Rp 461K vs Rp 543K in Semarang). Same revenue rank, very different order economics.</div>
+            <div class="stat-box"><strong>So what:</strong> Bekasi's revenue is being carried by order count, not basket size — a different ad-budget argument than the cities above it.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="figure-grid">
+        <figure class="case-figure">
+          <img src="../assets/img/gayanara/top-5-cities.png" alt="Bar chart of top 5 cities by revenue, coloured by average order value, showing Bekasi with the lowest AOV of the group" loading="lazy">
+          <figcaption>Top 5 cities by revenue, coloured by AOV — Bekasi stands out.</figcaption>
+        </figure>
+        <figure class="case-figure">
+          <img src="../assets/img/gayanara/customer-segments.png" alt="Bar chart of customer counts by RFM segment: Lost/Inactive 343, Regulars 269, At Risk VIPs 135, Champions 26, New/Promising 14" loading="lazy">
+          <figcaption>RFM segment distribution across 787 customers.</figcaption>
+        </figure>
+      </div>
+
+      <!-- Task 5 -->
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">05</span><span class="case-step-label">Promo impact</span>The naive comparison said promos <em>shrink</em> baskets. The naive comparison was broken.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>The trap:</strong> comparing <code>total_amount_idr</code> between promo and organic orders shows promo AOV at Rp 484K against Rp 514K organic — an apparent 6% penalty. But <code>total_amount_idr</code> is recorded <em>net of discount</em>. The discount is subtracted from promo orders and then read back as a smaller basket. The metric is measuring the discount, not behaviour.</div>
+            <div class="stat-box"><strong>The correction:</strong> add the discount back to put both groups on a like-for-like <strong>gross</strong> basis. Promo orders then average <strong>Rp 515,199</strong> against <strong>Rp 513,830</strong> organic — a 0.3% difference, which is effectively zero.</div>
+            <div class="stat-box"><strong>The real finding:</strong> Rp 31.4M was spent on discounts across 1,025 promo orders and produced <strong>no measurable basket lift</strong>. Not a penalty — a null result, which is the more useful answer and the more expensive one.</div>
+            <div class="stat-box"><strong>Recommendation:</strong> replace flat discounts with threshold-based promos — "Save Rp 50K on orders over Rp 600K" — which structurally require a larger basket to unlock, instead of rewarding purchases that were happening anyway.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="case-table-wrap">
+        <table class="case-table">
+          <thead>
+            <tr><th>Group</th><th class="num">Orders</th><th class="num">Discount given</th><th class="num">Net AOV (naive)</th><th class="num">Gross AOV (correct)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Used promo</strong></td><td class="num">1,025</td><td class="num">Rp 31,427,621</td><td class="num">Rp 484,538</td><td class="num">Rp 515,199</td></tr>
+            <tr><td>No promo</td><td class="num">1,496</td><td class="num">Rp 0</td><td class="num">Rp 513,830</td><td class="num">Rp 513,830</td></tr>
+          </tbody>
+          <caption>The left-hand comparison reverses the conclusion of the right-hand one. Only the right-hand one is like-for-like.</caption>
+        </table>
+      </div>
+
+      <figure class="case-figure">
+        <img src="../assets/img/gayanara/promo-impact.png" alt="Bar chart comparing gross average order value for promo versus non-promo orders, showing near-identical values around Rp 515,000" loading="lazy">
+        <figcaption>Promo impact on gross AOV — two bars, effectively the same height. That's the finding.</figcaption>
+      </figure>
+
+      <!-- Task 6 -->
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">06</span><span class="case-step-label">Courier evaluation</span>Anteraja has the worst cancellation rate <em>and</em> the best return rate — which points at a specific problem, not a bad partner.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Finding:</strong> Anteraja cancels 14.33% of orders (44 of 307), the highest of five couriers, against a fleet average near 10%. J&amp;T 12.39% · JNE 9.94% · SiCepat 9.73% · Pos Indonesia 7.45%.</div>
+            <div class="stat-box"><strong>The nuance:</strong> Anteraja simultaneously has the <em>lowest</em> return rate of the five (2.61%). Damage in transit would raise returns, not cancellations. The pattern points to friction <strong>before dispatch</strong> — pickup delays or capacity rejections — rather than mishandling.</div>
+            <div class="stat-box"><strong>Recommendation, scoped to the evidence:</strong> run a dispatch-time audit on Anteraja orders and shift volume in one region as a controlled test. Explicitly <em>not</em> a contract decision — 307 orders is too thin a sample to renegotiate on, and no significance testing was performed.</div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="case-figure">
+        <img src="../assets/img/gayanara/courier-performance.png" alt="Grouped bar chart of cancellation and return rates for five couriers, with Anteraja highest on cancellations and lowest on returns" loading="lazy">
+        <figcaption>Cancellation and return rates by courier. Anteraja's two bars move in opposite directions.</figcaption>
+      </figure>
+
+      <!-- Task 7 -->
+      <div class="finding-list">
+        <div class="finding">
+          <p class="finding-statement"><span class="finding-num">07</span><span class="case-step-label">Cohort retention</span>The flat retention curve is the most interesting result on this page — and it is a finding about the <em>data</em>, not the business.</p>
+          <div class="finding-stats">
+            <div class="stat-box"><strong>Finding:</strong> pooled across cohorts, repeat purchase rate holds between 8.1% and 12.6% from Month 1 through Month 12, with no downward slope. M1 9.15% · M6 10.32% · M12 10.40%.</div>
+            <div class="stat-box"><strong>Why that's wrong:</strong> real e-commerce retention curves drop steeply in Month 1 and then flatten out. A curve that is flat from the start means a customer's tenure carries no information about whether they'll buy next month — which is the signature of <strong>independent random draws</strong>, not of customer lifecycle behaviour.</div>
+            <div class="stat-box"><strong>The honest read:</strong> this is diagnostic of the synthetic generator. It would have been easy — and completely wrong — to present it as a churn crisis. Instead it sets a hard boundary: <strong>this dataset cannot support churn analysis at all</strong>, so churn drivers are out of scope rather than badly estimated.</div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="case-figure">
+        <img src="../assets/img/gayanara/retention-curve.png" alt="Cohort retention curve showing repeat purchase rate flat between roughly 8% and 13% from month 1 to month 12, with no decay" loading="lazy">
+        <figcaption>Pooled cohort retention, Month 1 – Month 12. A real curve decays. This one doesn't.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================= PHASE 3 ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Phase 3 · Dashboard</span>
+      <h2>Seven views on Tableau Public</h2>
+      <p class="case-lede">Built on the six pre-aggregated CSV extracts from Phase 2 rather than the raw transaction tables — the BI layer shouldn't be re-computing thousands of rows on every filter interaction.</p>
+      <div class="case-problem-grid">
+        <div class="case-problem-block">
+          <h3>What's on it</h3>
+          <ul>
+            <li>Three KPI cards — Total Revenue, Completed Orders, AOV</li>
+            <li>Monthly net revenue trend</li>
+            <li>Top 5 cities by revenue, AOV encoded as colour</li>
+            <li>Promo impact on gross AOV</li>
+            <li>Courier cancellation and return rates</li>
+            <li>Customer segments and the retention curve</li>
+          </ul>
+        </div>
+        <div class="case-problem-block">
+          <h3>Two things it does honestly</h3>
+          <p>The KPI cards <strong>reconcile</strong>: Rp 1,265,340,379 ÷ 2,521 = Rp 501,920. A viewer can check the arithmetic on the card row itself.</p>
+          <p>The date filter applies to the revenue and KPI views only. Because the CSVs are separate Tableau data sources, a global filter isn't available — so the filter's scope is <em>labelled</em> rather than left to look global and quietly mislead.</p>
+        </div>
+      </div>
+      <div class="case-resource-links">
+        <a class="btn btn-secondary" href="https://public.tableau.com/shared/4BX3MHD2Z?:display_count=n&amp;:origin=viz_share_link" target="_blank" rel="noopener">Open the live dashboard on Tableau Public</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= PHASE 4 ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Phase 4 · Stakeholder Deck</span>
+      <h2>Twelve slides, one of them about what we don't know</h2>
+      <p class="case-lede">Executive summary, KPIs, revenue timeline, retention, geography, promo, courier, segments, recommendations, limitations, and a closing slide — plus a dedicated <strong>"What this analysis can and can't tell us"</strong> slide, placed before the recommendations rather than buried in an appendix.</p>
+
+      <div class="deck-viewer no-js" id="gayanara-deck" data-deck-total="12" aria-roledescription="carousel" aria-label="Gayanara Performance Review — stakeholder deck">
+        <div class="deck-stage">
+          <img class="deck-slide is-current" src="../assets/img/gayanara/deck/slide-01.png" alt="Slide 1 of 12 — title slide: Gayanara E-Commerce Performance Review" loading="eager">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-02.png" alt="Slide 2 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-03.png" alt="Slide 3 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-04.png" alt="Slide 4 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-05.png" alt="Slide 5 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-06.png" alt="Slide 6 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-07.png" alt="Slide 7 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-08.png" alt="Slide 8 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-09.png" alt="Slide 9 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-10.png" alt="Slide 10 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-11.png" alt="Slide 11 of 12" loading="lazy">
+          <img class="deck-slide" src="../assets/img/gayanara/deck/slide-12.png" alt="Slide 12 of 12 — thank you" loading="lazy">
+        </div>
+      </div>
+      <p class="deck-note">12 slides · use the arrows or your keyboard's ← → keys, or <a href="../pdf/Gayanara_Performance_Review.pdf" target="_blank" rel="noopener">open the original PDF</a>.</p>
+    </div>
+  </section>
+
+  <!-- ============================= RECOMMENDATIONS ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Recommendations</span>
+      <h2>What I'd actually put in front of a stakeholder</h2>
+      <div class="reco-table">
+        <div class="reco-row">
+          <span class="reco-step">Step 01</span>
+          <span class="reco-title">Restructure promos</span>
+          <span class="reco-desc">Rp 31.4M of discounts produced no measurable basket lift. Replace flat discounts with threshold-based offers ("Save Rp 50K on orders over Rp 600K") that structurally require a larger basket to unlock — and run the next one as a holdout test so incrementality is measurable rather than inferred.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 02</span>
+          <span class="reco-title">Win back At Risk VIPs</span>
+          <span class="reco-desc">135 high-spending customers have gone dormant, including the single largest spender at 129 days. This is an exportable list, not an abstraction — target it directly before spending more on acquisition.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 03</span>
+          <span class="reco-title">Audit Anteraja dispatch</span>
+          <span class="reco-desc">Highest cancellation rate paired with the lowest return rate points to pre-dispatch friction. Audit dispatch timing and shift volume in one region as a controlled test — not a contract decision on 307 orders.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 04</span>
+          <span class="reco-title">Protect volume-led growth</span>
+          <span class="reco-desc">Growth is coming entirely from order count while AOV stays flat. That makes acquisition and repeat-purchase frequency the levers that matter, and it makes the flat AOV a deliberate target to attack rather than an accident to ignore.</span>
+        </div>
+        <div class="reco-row">
+          <span class="reco-step">Step 05</span>
+          <span class="reco-title">Fix duplicate accounts upstream</span>
+          <span class="reco-desc">Three duplicate emails is not a reporting problem today, but it is a signup-flow problem that compounds. Route it to data engineering rather than patching it in every downstream query.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= LIMITATIONS ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Limitations</span>
+      <h2>What this analysis can't tell you</h2>
+      <p class="case-lede">This section exists because the value of an analysis is bounded by what its data can actually support, and saying so is part of the deliverable — not a disclaimer bolted onto the end.</p>
+      <ul class="case-summary-list">
+        <li><strong>No margin data.</strong> The promo analysis measures revenue impact, not true ROI. It is also observational rather than causal — establishing incrementality would require a holdout test.</li>
+        <li><strong>Courier samples are too small.</strong> Anteraja carries 307 orders and Pos Indonesia 161. No significance testing was performed, so courier differences are directional signals for investigation, not conclusions.</li>
+        <li><strong>No lifecycle dynamics in the data.</strong> The flat retention curve shows purchases behave as independent draws, so churn drivers are out of scope entirely rather than weakly estimated.</li>
+        <li><strong>Three duplicate emails were identified and deliberately not merged.</strong> <code>customer_id</code> is retained as the grain; segment counts are directional at the account level.</li>
+        <li><strong>RFM boundaries are fixed business rules, not statistical clusters.</strong> They were chosen for interpretability, and the "Lost" threshold in particular inflates that segment by construction.</li>
+        <li><strong>Scope is January 2022 – February 2025</strong>, and February 2025 may be a partial month — read the final point on the revenue trend with that in mind.</li>
+        <li><strong>The dataset is synthetic throughout.</strong> Flat category revenue and flat retention are generator artifacts. Nothing here is a claim about a real market.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================= AI DISCLOSURE ============================= -->
+  <section class="case-section">
+    <div class="wrap">
+      <span class="eyebrow">Disclosure</span>
+      <h2>AI assistance, disclosed</h2>
+      <div class="case-callout">
+        <p>All SQL, analysis, and dashboard work is my own. After completing the first version, I ran the full project — notebooks, deck, and dashboard — through structured review with Claude (Anthropic), acting as a senior analyst, hiring manager, and end user.</p>
+        <p>That review surfaced four substantive errors I then corrected:</p>
+        <ul class="case-summary-list">
+          <li>My promo conclusion was reversed — I'd compared post-discount AOV against pre-discount AOV, which made promos look like they shrank baskets. Corrected to a like-for-like gross comparison.</li>
+          <li>My three headline KPIs used three different revenue definitions and didn't reconcile. Consolidated to a single definition that ties exactly to source.</li>
+          <li>Revenue was computed on catalog list price and ignored line-item quantity, understating units by 29%.</li>
+          <li>I had read the flat retention curve as a churn crisis. It's actually diagnostic of synthetic data — real retention curves decay.</li>
+        </ul>
+        <p>Claude also helped tighten the wording of findings and recommendations. Every number on this page was re-run and verified by me against the source data.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= RESOURCES ============================= -->
+  <section class="case-section alt">
+    <div class="wrap">
+      <span class="eyebrow">Appendix</span>
+      <h2>Working files</h2>
+      <div class="resource-grid">
+        <a class="resource-card" href="../downloads/gayanara/01_Data_Quality_Audit.ipynb" download>
+          <span class="resource-label">Notebook · Phase 1</span>
+          <span class="resource-title">01_Data_Quality_Audit.ipynb</span>
+          <span class="resource-desc">DuckDB build from raw CSVs, plus the four audit checks and the decisions they led to.</span>
+        </a>
+        <a class="resource-card" href="../downloads/gayanara/02_Exploratory_Data_Analysis_EDA.ipynb" download>
+          <span class="resource-label">Notebook · Phase 2</span>
+          <span class="resource-title">02_Exploratory_Data_Analysis_EDA.ipynb</span>
+          <span class="resource-desc">All seven analytical tasks in SQL, from revenue trend through cohort retention.</span>
+        </a>
+        <a class="resource-card" href="../pdf/Gayanara_Performance_Review.pdf" target="_blank" rel="noopener">
+          <span class="resource-label">Slide deck</span>
+          <span class="resource-title">Full presentation (PDF) <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">12 slides, including the "what this analysis can and can't tell us" slide.</span>
+        </a>
+        <a class="resource-card" href="../assets/img/gayanara/gayanara-dashboard-preview.png" target="_blank" rel="noopener">
+          <span class="resource-label">Dashboard</span>
+          <span class="resource-title">Full dashboard image (PNG) <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Static capture of all seven views, for when Tableau Public is slow to load.</span>
+        </a>
+        <a class="resource-card" href="https://github.com/renalazy/gayanara-ecommerce/tree/main/dashboard_exports" target="_blank" rel="noopener">
+          <span class="resource-label">Aggregated data</span>
+          <span class="resource-title">Six dashboard CSVs <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">geospatial · promo_roi · courier_eval · rfm_segments · cohort_retention · monthly_revenue.</span>
+        </a>
+        <a class="resource-card" href="https://github.com/renalazy/gayanara-ecommerce" target="_blank" rel="noopener">
+          <span class="resource-label">Source</span>
+          <span class="resource-title">GitHub repository <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Notebooks, SQL, and export scripts for the whole pipeline.</span>
+        </a>
+        <a class="resource-card" href="https://public.tableau.com/shared/4BX3MHD2Z?:display_count=n&amp;:origin=viz_share_link" target="_blank" rel="noopener">
+          <span class="resource-label">Dashboard</span>
+          <span class="resource-title">Tableau Public <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Interactive version — filter the revenue and KPI views by date.</span>
+        </a>
+        <a class="resource-card" href="https://ngulikdata.com/" target="_blank" rel="noopener">
+          <span class="resource-label">Dataset</span>
+          <span class="resource-title">NgulikData <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>
+          <span class="resource-desc">Original synthetic Gayanara dataset — linked at source rather than rehosted here.</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>© <span id="current-year">2026</span> Renaldy Bilal Setyawan. Static site, no backend.</span>
+    <div class="footer-links">
+      <a href="../index.html#projects">← All projects</a>
+      <a href="../index.html#contact">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js?v=2"></script>
+</body>
+</html>

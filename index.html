@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/style.css?v=2">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -386,7 +386,7 @@
       <div class="section-head">
         <span class="eyebrow">Projects</span>
         <h2>Real work, honestly labeled</h2>
-        <p>Two analytics case studies, plus three data-engineering integrations that move real institutional data day to day. Filter by stack to jump straight to relevant work.</p>
+        <p>Three analytics case studies, plus three data-engineering integrations that move real institutional data day to day. Filter by stack to jump straight to relevant work.</p>
       </div>
 
       <div class="stack-filter" role="group" aria-label="Filter projects by stack">
@@ -408,6 +408,15 @@
           <p class="project-meta">RevoU · 2024</p>
           <p>Analyzed 375K+ Kickstarter campaigns (2009–2017) for the traits behind successful launches. Exploratory data analysis in Python; live Tableau dashboard; investor-facing recommendations.</p>
           <a class="btn btn-secondary project-case-link" href="projects/deepp-kickstarter.html">View case study →</a>
+        </article>
+
+        <article class="project-card is-real" data-stacks="python tableau postgresql">
+          <span class="project-status status-real">Data Analytics</span>
+          <img class="project-thumb" src="assets/img/gayanara/gayanara-dashboard-preview.png" alt="Tableau dashboard for Gayanara e-commerce showing revenue KPIs, monthly trend, top cities, promo impact, courier rates, customer segments, and retention curve" loading="lazy">
+          <h3>Gayanara E-Commerce — Performance Review</h3>
+          <p class="project-meta">Self-directed · 2025</p>
+          <p>End-to-end analytics on a five-table Indonesian fashion e-commerce dataset (10,586 rows): data quality audit, SQL modeling in DuckDB, and seven analytical tasks from revenue trend to cohort retention. Found that Rp 31.4M in discounts produced no measurable basket lift once the comparison was corrected to a like-for-like gross basis. Synthetic dataset — a workflow demonstration, stated as such throughout.</p>
+          <a class="btn btn-secondary project-case-link" href="projects/gayanara-ecommerce.html">View case study →</a>
         </article>
 
         <article class="project-card is-real" data-stacks="excel">
@@ -577,6 +586,6 @@
   </div>
 </footer>
 
-<script src="assets/js/main.js"></script>
+<script src="assets/js/main.js?v=2"></script>
 </body>
 </html>
