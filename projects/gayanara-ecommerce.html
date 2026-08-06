@@ -247,7 +247,7 @@
     <div class="wrap">
       <span class="eyebrow">Phase 1 · Data Quality Audit</span>
       <h2>Four checks before any number is quoted</h2>
-      <p class="case-lede">Notebook <code>01_Data_Quality_Audit.ipynb</code>. Each check ends in a decision, and each decision is written down — including the one where the answer was "leave it alone."</p>
+      <p class="case-lede">Notebook <a href="notebooks/01-data-quality-audit.html"><code>01_Data_Quality_Audit.ipynb</code></a> — every query below is shown in full, with its output, on the rendered notebook page. Each check ends in a decision, and each decision is written down — including the one where the answer was "leave it alone."</p>
 
       <div class="finding-list">
         <div class="finding">
@@ -258,7 +258,26 @@
             <div class="stat-box"><strong>reviews.review_text</strong> — 8.0% missing (120 rows). Normal user behaviour — people leave a star rating without writing anything. Not a data defect.</div>
           </div>
         </div>
+      </div>
 
+      <div class="case-code">-- One block per suspect column, UNION ALL'd into a single audit table.
+-- The customers block is shown; products.material and reviews.review_text
+-- follow the same shape. Full query in the notebook.
+SELECT
+  'customers' AS table_name,
+  'phone'     AS column_name,
+  COUNT(*)    AS total_rows,
+  SUM(CASE WHEN phone IS NULL THEN 1 ELSE 0 END) AS null_count,
+  ROUND(
+    SUM(CASE WHEN phone IS NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+    2
+  ) AS null_percentage
+FROM customers
+UNION ALL
+-- ... products.material, reviews.review_text
+;</div>
+
+      <div class="finding-list">
         <div class="finding">
           <p class="finding-statement"><span class="finding-num">02</span><span class="case-step-label">Duplicate customers</span>Three email addresses map to two <code>customer_id</code>s each — and I deliberately did <strong>not</strong> merge them.</p>
           <div class="finding-stats">
@@ -267,7 +286,17 @@
             <div class="stat-box"><strong>Follow-up:</strong> flagged for upstream data engineering as an account-creation issue. Documented here as an explicit decision rather than left to look like an oversight.</div>
           </div>
         </div>
+      </div>
 
+      <div class="case-code">SELECT
+  email,
+  COUNT(customer_id) AS account_count
+FROM customers
+GROUP BY email
+HAVING COUNT(customer_id) &gt; 1
+ORDER BY account_count DESC;</div>
+
+      <div class="finding-list">
         <div class="finding">
           <p class="finding-statement"><span class="finding-num">03</span><span class="case-step-label">Category standardization</span>Fourteen distinct category values collapse to six real ones.</p>
           <div class="finding-stats">
@@ -275,7 +304,29 @@
             <div class="stat-box"><strong>The fix:</strong> a <code>CASE WHEN</code> mapping to six clean categories — Jacket, Pants, Accessories, Dress, Shirt, T-Shirt — persisted as a new <code>products.category_clean</code> column so downstream queries never re-derive it.</div>
           </div>
         </div>
+      </div>
 
+      <div class="case-code">-- 1. Add a column to hold the standardized category
+ALTER TABLE products ADD COLUMN category_clean VARCHAR;
+
+-- 2. Map every raw spelling — Indonesian and English, any casing — to one label
+UPDATE products
+SET category_clean = CASE
+    WHEN LOWER(category) IN ('aksesoris', 'accessories')   THEN 'Accessories'
+    WHEN LOWER(category) IN ('celana', 'pants')            THEN 'Pants'
+    WHEN LOWER(category) IN ('jaket', 'jacket')            THEN 'Jacket'
+    WHEN LOWER(category) IN ('kemeja', 'shirt')            THEN 'Shirt'
+    WHEN LOWER(category) IN ('kaos', 't-shirt', 'tshirt')  THEN 'T-Shirt'
+    WHEN LOWER(category) IN ('dress')                      THEN 'Dress'
+    ELSE 'Other'
+END;
+
+-- 3. Verify: 'Other' must come back empty, or the mapping missed a spelling
+SELECT category_clean, COUNT(*) AS count
+FROM products
+GROUP BY category_clean;</div>
+
+      <div class="finding-list">
         <div class="finding">
           <p class="finding-statement"><span class="finding-num">04</span><span class="case-step-label">Referential integrity</span>Zero orphaned rows — which is what makes the rest of the analysis safe.</p>
           <div class="finding-stats">
@@ -284,6 +335,17 @@
           </div>
         </div>
       </div>
+
+      <div class="case-code">-- LEFT JOIN, not INNER: an INNER JOIN would hide the very rows being counted
+SELECT
+  COUNT(*) AS total_items_sold,
+  SUM(CASE WHEN p.product_id IS NULL THEN 1 ELSE 0 END) AS orphaned_items,
+  ROUND(
+    SUM(CASE WHEN p.product_id IS NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(*),
+    2
+  ) AS orphaned_percentage
+FROM order_items oi
+LEFT JOIN products p ON oi.product_id = p.product_id;</div>
     </div>
   </section>
 
@@ -292,7 +354,7 @@
     <div class="wrap">
       <span class="eyebrow">Phase 2 · Exploratory Analysis</span>
       <h2>Seven questions, seven answers</h2>
-      <p class="case-lede">Notebook <code>02_Exploratory_Data_Analysis_EDA.ipynb</code>. Each task below states the business question, the approach — including where the obvious approach would have been wrong — and the finding.</p>
+      <p class="case-lede">Notebook <a href="notebooks/02-exploratory-data-analysis.html"><code>02_Exploratory_Data_Analysis_EDA.ipynb</code></a> — the rendered notebook page has every query with its result table. Each task below states the business question, the approach — including where the obvious approach would have been wrong — and the finding.</p>
 
       <!-- Task 1 -->
       <div class="finding-list">
@@ -349,6 +411,21 @@ ORDER BY order_month;</div>
         </div>
       </div>
 
+      <div class="case-code">-- category_clean, not category: the raw column would split Jacket across
+-- 'Jaket' and 'jacket' and rank a fragment of it
+SELECT
+    p.category_clean,
+    COUNT(DISTINCT oi.order_id) AS total_orders,
+    SUM(oi.quantity)            AS total_units_sold,
+    SUM(oi.subtotal_idr)        AS gross_revenue,
+    CAST(SUM(oi.subtotal_idr) / SUM(oi.quantity) AS BIGINT) AS avg_price_per_unit
+FROM order_items oi
+JOIN products p ON oi.product_id = p.product_id
+JOIN orders   o ON oi.order_id   = o.order_id
+WHERE o.order_status NOT IN ('cancelled', 'returned')
+GROUP BY p.category_clean
+ORDER BY gross_revenue DESC;</div>
+
       <div class="case-table-wrap">
         <table class="case-table">
           <thead>
@@ -376,7 +453,38 @@ ORDER BY order_month;</div>
             <div class="stat-box"><strong>So what:</strong> dormancy is the default state of this base, not an edge case. The actionable slice is the 135 At Risk (VIPs) — high spenders who have gone quiet, including the single highest-spending customer at 129 days without a purchase.</div>
           </div>
         </div>
+      </div>
 
+      <div class="case-code">-- Recency is measured against the dataset's own max order_date, not today.
+-- Anchoring to CURRENT_DATE would make every customer look dormant purely
+-- because the extract is historical.
+WITH rfm_base AS (
+    SELECT
+        c.email,
+        CAST((SELECT MAX(order_date) FROM orders) AS DATE)
+            - CAST(MAX(o.order_date) AS DATE) AS recency_days,
+        COUNT(DISTINCT o.order_id)            AS frequency,
+        SUM(o.total_amount_idr)               AS monetary_value
+    FROM orders o
+    JOIN customers c ON o.customer_id = c.customer_id
+    GROUP BY o.customer_id, c.email
+)
+SELECT
+    email,
+    recency_days,
+    frequency,
+    monetary_value,
+    CASE
+        WHEN recency_days &lt;= 60  AND frequency &gt;= 5 AND monetary_value &gt;= 4000000 THEN 'Champions'
+        WHEN recency_days &gt;  60  AND (frequency &gt;= 5 OR monetary_value &gt;= 4000000) THEN 'At Risk (VIPs)'
+        WHEN recency_days &lt;= 30  AND frequency &lt; 3  THEN 'New / Promising'
+        WHEN recency_days &gt;= 120 THEN 'Lost / Inactive'
+        ELSE 'Regulars'
+    END AS customer_segment
+FROM rfm_base
+ORDER BY monetary_value DESC;</div>
+
+      <div class="finding-list">
         <!-- Task 4 -->
         <div class="finding">
           <p class="finding-statement"><span class="finding-num">04</span><span class="case-step-label">Geography</span>Revenue is spread evenly across cities — but encoding AOV as colour surfaces one outlier.</p>
@@ -387,6 +495,20 @@ ORDER BY order_month;</div>
           </div>
         </div>
       </div>
+
+      <div class="case-code">-- AOV is computed per city here rather than averaged in the BI layer:
+-- averaging order values across cities would weight small cities equally
+SELECT
+    shipping_province,
+    shipping_city,
+    COUNT(DISTINCT order_id) AS total_orders,
+    SUM(total_amount_idr)    AS total_revenue,
+    CAST(SUM(total_amount_idr) / COUNT(DISTINCT order_id) AS BIGINT) AS average_order_value
+FROM orders
+WHERE order_status NOT IN ('cancelled', 'returned')
+GROUP BY shipping_province, shipping_city
+ORDER BY total_revenue DESC
+LIMIT 15;</div>
 
       <div class="figure-grid">
         <figure class="case-figure">
@@ -411,6 +533,22 @@ ORDER BY order_month;</div>
           </div>
         </div>
       </div>
+
+      <div class="case-code">-- total_amount_idr is stored NET of discount. Comparing it across the two
+-- groups measures the discount itself, not basket behaviour — so gross_aov
+-- adds the discount back and puts both groups on the same footing.
+SELECT
+    CASE WHEN promo_code IS NULL THEN 'No Promo' ELSE 'Used Promo' END AS promo_status,
+    COUNT(DISTINCT order_id) AS total_orders,
+    SUM(total_amount_idr)    AS net_revenue,
+    SUM(COALESCE(discount_amount_idr, 0)) AS total_discount_given,
+    CAST(SUM(total_amount_idr + COALESCE(discount_amount_idr, 0))
+         / COUNT(DISTINCT order_id) AS BIGINT) AS gross_aov,   -- like-for-like
+    CAST(SUM(total_amount_idr)
+         / COUNT(DISTINCT order_id) AS BIGINT) AS net_aov      -- the misleading one
+FROM orders
+WHERE order_status NOT IN ('cancelled', 'returned')
+GROUP BY promo_status;</div>
 
       <div class="case-table-wrap">
         <table class="case-table">
@@ -442,6 +580,21 @@ ORDER BY order_month;</div>
         </div>
       </div>
 
+      <div class="case-code">-- No status filter on this one, deliberately: cancelled and returned orders
+-- are the measurement here, so excluding them would zero out the metric
+SELECT
+    courier,
+    COUNT(order_id) AS total_orders,
+    SUM(CASE WHEN order_status = 'returned'  THEN 1 ELSE 0 END) AS returned_orders,
+    SUM(CASE WHEN order_status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_orders,
+    ROUND(SUM(CASE WHEN order_status = 'returned'  THEN 1.0 ELSE 0 END)
+          / COUNT(order_id) * 100, 2) AS return_rate_pct,
+    ROUND(SUM(CASE WHEN order_status = 'cancelled' THEN 1.0 ELSE 0 END)
+          / COUNT(order_id) * 100, 2) AS cancel_rate_pct
+FROM orders
+GROUP BY courier
+ORDER BY return_rate_pct DESC;</div>
+
       <figure class="case-figure">
         <img src="../assets/img/gayanara/courier-performance.png" alt="Grouped bar chart of cancellation and return rates for five couriers, with Anteraja highest on cancellations and lowest on returns" loading="lazy">
         <figcaption>Cancellation and return rates by courier. Anteraja's two bars move in opposite directions.</figcaption>
@@ -458,6 +611,46 @@ ORDER BY order_month;</div>
           </div>
         </div>
       </div>
+
+      <div class="case-code">WITH first_purchases AS (
+    -- Step 1: first month a customer made a COMPLETED purchase. The status
+    -- filter matters twice over: without it a cancelled order can define the
+    -- cohort month, and cancelled orders then count as "retention".
+    SELECT customer_id, DATE_TRUNC('month', MIN(order_date)) AS cohort_month
+    FROM orders
+    WHERE order_status NOT IN ('cancelled', 'returned')
+    GROUP BY customer_id
+),
+cohort_data AS (            -- Step 2: every later completed purchase month
+    SELECT f.cohort_month, DATE_TRUNC('month', o.order_date) AS activity_month, o.customer_id
+    FROM orders o
+    JOIN first_purchases f ON o.customer_id = f.customer_id
+    WHERE o.order_status NOT IN ('cancelled', 'returned')
+),
+cohort_sizes AS (           -- Step 3: original size of each cohort
+    SELECT cohort_month, COUNT(DISTINCT customer_id) AS initial_customers
+    FROM first_purchases
+    GROUP BY cohort_month
+),
+retention_counts AS (       -- Step 4: months-since-first-order, and who was active
+    SELECT c.cohort_month,
+           DATE_DIFF('month', c.cohort_month, c.activity_month) AS month_index,
+           COUNT(DISTINCT c.customer_id) AS active_customers
+    FROM cohort_data c
+    GROUP BY c.cohort_month, month_index
+)
+-- Pooled across cohorts and weighted by cohort size, so a single small
+-- cohort with an odd month can't swing the curve
+SELECT
+    r.month_index,
+    SUM(r.active_customers)   AS total_active,
+    SUM(s.initial_customers)  AS total_cohort_base,
+    ROUND(SUM(r.active_customers) * 100.0 / SUM(s.initial_customers), 2) AS avg_retention_pct
+FROM retention_counts r
+JOIN cohort_sizes s ON r.cohort_month = s.cohort_month
+WHERE r.month_index &lt;= 12
+GROUP BY r.month_index
+ORDER BY r.month_index;</div>
 
       <figure class="case-figure">
         <img src="../assets/img/gayanara/retention-curve.png" alt="Cohort retention curve showing repeat purchase rate flat between roughly 8% and 13% from month 1 to month 12, with no decay" loading="lazy">
@@ -601,16 +794,24 @@ ORDER BY order_month;</div>
       <span class="eyebrow">Appendix</span>
       <h2>Working files</h2>
       <div class="resource-grid">
-        <a class="resource-card" href="../downloads/gayanara/01_Data_Quality_Audit.ipynb" download>
+        <div class="resource-card">
           <span class="resource-label">Notebook · Phase 1</span>
           <span class="resource-title">01_Data_Quality_Audit.ipynb</span>
           <span class="resource-desc">DuckDB build from raw CSVs, plus the four audit checks and the decisions they led to.</span>
-        </a>
-        <a class="resource-card" href="../downloads/gayanara/02_Exploratory_Data_Analysis_EDA.ipynb" download>
+          <span class="resource-actions">
+            <a href="notebooks/01-data-quality-audit.html">View notebook</a>
+            <a href="../downloads/gayanara/01_Data_Quality_Audit.ipynb" download>Download .ipynb</a>
+          </span>
+        </div>
+        <div class="resource-card">
           <span class="resource-label">Notebook · Phase 2</span>
           <span class="resource-title">02_Exploratory_Data_Analysis_EDA.ipynb</span>
           <span class="resource-desc">All seven analytical tasks in SQL, from revenue trend through cohort retention.</span>
-        </a>
+          <span class="resource-actions">
+            <a href="notebooks/02-exploratory-data-analysis.html">View notebook</a>
+            <a href="../downloads/gayanara/02_Exploratory_Data_Analysis_EDA.ipynb" download>Download .ipynb</a>
+          </span>
+        </div>
         <a class="resource-card" href="../pdf/Gayanara_Performance_Review.pdf" target="_blank" rel="noopener">
           <span class="resource-label">Slide deck</span>
           <span class="resource-title">Full presentation (PDF) <svg class="icon" aria-hidden="true"><use href="#icon-external"></use></svg></span>

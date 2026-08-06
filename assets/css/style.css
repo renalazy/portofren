@@ -1034,6 +1034,16 @@ details[open] .archived-summary::after { content: "–"; }
 }
 .resource-title { font-weight: 600; font-size: 0.95rem; }
 .resource-desc { font-size: 0.8rem; color: var(--ink-soft); }
+/* cards offering more than one action can't be a single <a> — links go inline */
+.resource-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
 
 @media (max-width: 900px) {
   .method-steps { grid-template-columns: repeat(3, 1fr); row-gap: 1.75rem; }

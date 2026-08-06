@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01. Data Quality Audit &amp; Cleaning | Renaldy Bilal Setyawan</title>
+<meta name="description" content="Executed notebook: four data quality checks in SQL on the Gayanara e-commerce dataset — null audit, duplicate customers, category standardization, and referential integrity.">
+<meta name="author" content="Renaldy Bilal Setyawan">
+<meta name="robots" content="index, follow">
+
+<link rel="icon" type="image/png" href="../../assets/img/r.png">
+<link rel="apple-touch-icon" href="../../assets/img/r.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../../assets/css/style.css?v=2">
+<link rel="stylesheet" href="../../assets/css/notebook.css?v=1">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<svg class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </symbol>
+</svg>
+
+<header class="site-header case-header">
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="../../index.html" aria-label="Renaldy Bilal Setyawan — home">
+      <img src="../../assets/img/r.png" alt="" width="26" height="26">
+      <span aria-hidden="true">RBS</span>
+    </a>
+    <a class="case-back" href="../gayanara-ecommerce.html">
+      <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
+      Back to case study
+    </a>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="nb-hero graph-paper">
+    <div class="wrap">
+      <span class="eyebrow">Phase 1 · Data Quality Audit</span>
+      <h1>01. Data Quality Audit &amp; Cleaning</h1>
+      <p class="nb-hero-sub">Executed notebook: four data quality checks in SQL on the Gayanara e-commerce dataset — null audit, duplicate customers, category standardization, and referential integrity.</p>
+      <p class="nb-source">Source notebook: <code>01_Data_Quality_Audit.ipynb</code> · rendered with saved cell outputs, exactly as executed.</p>
+      <div class="case-resource-links">
+        <a class="btn btn-secondary" href="../gayanara-ecommerce.html">Read the case study</a>
+        <a class="btn btn-secondary" href="../../downloads/gayanara/01_Data_Quality_Audit.ipynb" download>Download .ipynb</a>
+        <a class="btn btn-secondary" href="https://github.com/renalazy/gayanara-ecommerce" target="_blank" rel="noopener">GitHub repo</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="nb-body">
+    <div class="wrap">
+      <div class="nb-md"><hr>
+<h4>⚠️ About this dataset</h4>
+<p>Gayanara is a <strong>synthetically generated</strong> e-commerce dataset (source: ngulikdata). It is used here to demonstrate analytical workflow — data auditing, SQL modeling, segmentation, and BI delivery — not to produce real business conclusions.</p>
+<p>Where the analysis surfaces artifacts of the generating process rather than genuine business signal, this is stated explicitly (see Notebook 02, Task 2 on category distribution and Task 7 on retention curve shape). Distinguishing the two is treated as part of the analysis.</p></div>
+      <div class="nb-md"><h3>🛠️ Task 0: Environment Setup &amp; Data Ingestion</h3>
+<p><strong>Objective:</strong> Initialize the analytical database and ingest raw CSV files into relational tables.</p>
+<p>To ensure high-performance querying without needing a standalone database server, this project utilizes <strong>DuckDB</strong>. This allows for incredibly fast, out-of-core SQL aggregations directly within the notebook.</p>
+<p><strong>The setup process below performs the following:</strong></p>
+<ol><li>Establishes a connection to a local <code>gayanara.db</code> file.</li><li>Ingests raw CSV data from the <code>Dataset</code> directory directly into 5 core SQL tables using <code>read_csv_auto</code>.</li><li>Binds the DuckDB connection to the <code>jupysql</code> engine to enable native <code>%%sql</code> execution in subsequent cells.</li></ol></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-kw">import</span> duckdb, os
+
+DATA_DIR = <span class="tok-string">&#x27;Dataset/gayanara&#x27;</span>
+
+<span class="tok-kw">if</span> <span class="tok-kw">not</span> os.path.exists(DATA_DIR):
+    <span class="tok-kw">raise</span> FileNotFoundError(
+        f<span class="tok-string">&quot;Could not find &#x27;{DATA_DIR}&#x27;. Launch Jupyter from the repository root, &quot;</span>
+        f<span class="tok-string">&quot;or update DATA_DIR to point at the CSV folder.&quot;</span>
+    )
+
+con = duckdb.connect(<span class="tok-string">&#x27;gayanara.db&#x27;</span>)
+<span class="tok-kw">print</span>(f<span class="tok-string">&quot;Connected. Reading from {DATA_DIR}/&quot;</span>)</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><pre class="nb-stream">Connected. Reading from Dataset/gayanara/
+</pre></div></div></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-kw">for</span> <span class="tok-kw">table</span> <span class="tok-kw">in</span> [<span class="tok-string">&#x27;customers&#x27;</span>, <span class="tok-string">&#x27;order_items&#x27;</span>, <span class="tok-string">&#x27;orders&#x27;</span>, <span class="tok-string">&#x27;products&#x27;</span>, <span class="tok-string">&#x27;reviews&#x27;</span>]:
+    con.execute(f<span class="tok-string">&quot;&quot;</span><span class="tok-string">&quot;
+        CREATE OR REPLACE TABLE {table} AS
+        SELECT * FROM read_csv_auto(&#x27;{DATA_DIR}/{table}.csv&#x27;);
+    &quot;</span><span class="tok-string">&quot;&quot;</span>)
+
+con.execute(<span class="tok-string">&quot;SHOW TABLES;&quot;</span>).df()</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>customers</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>order_items</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>orders</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>products</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>reviews</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div></div></div>
+      <div class="nb-md"><h3>🔍 Task 1: Null Value Audit across Core Tables</h3>
+<p><strong>Business Question:</strong> How complete are critical fields like customer phone numbers, product materials, and review texts? <strong>Target Columns:</strong> <code>customers.phone</code>, <code>products.material</code>, <code>reviews.review_text</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%load_ext</span> sql
+<span class="tok-magic">%sql</span> con
+<span class="tok-magic">%config</span> SqlMagic.displaylimit = <span class="tok-num">50</span></code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><pre class="nb-stream">The sql extension is already loaded. To reload it, use:
+  %reload_ext sql
+</pre></div></div></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SHOW</span> <span class="tok-kw">TABLES</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>customers</td>
+        </tr>
+        <tr>
+            <td>order_items</td>
+        </tr>
+        <tr>
+            <td>orders</td>
+        </tr>
+        <tr>
+            <td>products</td>
+        </tr>
+        <tr>
+            <td>reviews</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><p><code>customers.phone</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-string">&#x27;customers&#x27;</span> <span class="tok-kw">AS</span> table_name,
+  <span class="tok-string">&#x27;phone&#x27;</span> <span class="tok-kw">AS</span> column_name,
+  <span class="tok-kw">COUNT</span>(*) <span class="tok-kw">AS</span> total_rows,
+  <span class="tok-kw">SUM</span>(
+    <span class="tok-kw">CASE</span>
+      <span class="tok-kw">WHEN</span> phone <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+      <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+    <span class="tok-kw">END</span>
+  ) <span class="tok-kw">AS</span> null_count,
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">SUM</span>(
+      <span class="tok-kw">CASE</span>
+        <span class="tok-kw">WHEN</span> phone <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+      <span class="tok-kw">END</span>
+    ) * <span class="tok-num">100.0</span> / <span class="tok-kw">COUNT</span>(*),
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> null_percentage
+<span class="tok-kw">FROM</span>
+  customers</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>table_name</th>
+            <th>column_name</th>
+            <th>total_rows</th>
+            <th>null_count</th>
+            <th>null_percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>customers</td>
+            <td>phone</td>
+            <td>800</td>
+            <td>40</td>
+            <td>5.0</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><p><code>products.material</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-string">&#x27;products&#x27;</span> <span class="tok-kw">AS</span> table_name,
+  <span class="tok-string">&#x27;material&#x27;</span> <span class="tok-kw">AS</span> column_name,
+  <span class="tok-kw">SUM</span>(
+    <span class="tok-kw">CASE</span>
+      <span class="tok-kw">WHEN</span> material <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+      <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+    <span class="tok-kw">END</span>
+  ) <span class="tok-kw">AS</span> null_count,
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">SUM</span>(
+      <span class="tok-kw">CASE</span>
+        <span class="tok-kw">WHEN</span> material <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+      <span class="tok-kw">END</span>
+    ) * <span class="tok-num">100</span> / <span class="tok-kw">COUNT</span>(*),
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> null_percentage
+<span class="tok-kw">FROM</span>
+  products</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>table_name</th>
+            <th>column_name</th>
+            <th>null_count</th>
+            <th>null_percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>products</td>
+            <td>material</td>
+            <td>9</td>
+            <td>3.0</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><p><code>reviews.review_text</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-string">&#x27;reviews&#x27;</span> <span class="tok-kw">AS</span> table_name,
+  <span class="tok-string">&#x27;review_text&#x27;</span> <span class="tok-kw">AS</span> column_name,
+  <span class="tok-kw">SUM</span>(
+    <span class="tok-kw">CASE</span>
+      <span class="tok-kw">WHEN</span> review_text <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+      <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+    <span class="tok-kw">END</span>
+  ) <span class="tok-kw">AS</span> null_count,
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">SUM</span>(
+      <span class="tok-kw">CASE</span>
+        <span class="tok-kw">WHEN</span> review_text <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+      <span class="tok-kw">END</span>
+    ) * <span class="tok-num">100</span> / <span class="tok-kw">COUNT</span>(*),
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> null_percentage
+<span class="tok-kw">FROM</span>
+  reviews</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>table_name</th>
+            <th>column_name</th>
+            <th>null_count</th>
+            <th>null_percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>reviews</td>
+            <td>review_text</td>
+            <td>120</td>
+            <td>8.0</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><p><strong>Target Columns:</strong> <code>customers.phone</code>, <code>products.material</code>, <code>reviews.review_text</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-string">&#x27;customers&#x27;</span> <span class="tok-kw">AS</span> table_name,
+  <span class="tok-string">&#x27;phone&#x27;</span> <span class="tok-kw">AS</span> column_name,
+  <span class="tok-kw">COUNT</span>(*) <span class="tok-kw">AS</span> total_rows,
+  <span class="tok-kw">SUM</span>(
+    <span class="tok-kw">CASE</span>
+      <span class="tok-kw">WHEN</span> phone <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+      <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+    <span class="tok-kw">END</span>
+  ) <span class="tok-kw">AS</span> null_count,
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">SUM</span>(
+      <span class="tok-kw">CASE</span>
+        <span class="tok-kw">WHEN</span> phone <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+      <span class="tok-kw">END</span>
+    ) * <span class="tok-num">100.0</span> / <span class="tok-kw">COUNT</span>(*),
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> null_percentage
+<span class="tok-kw">FROM</span>
+  customers
+<span class="tok-kw">UNION ALL</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-string">&#x27;products&#x27;</span> <span class="tok-kw">AS</span> table_name,
+  <span class="tok-string">&#x27;material&#x27;</span> <span class="tok-kw">AS</span> column_name,
+  <span class="tok-kw">COUNT</span>(*) <span class="tok-kw">AS</span> total_rows,
+  <span class="tok-kw">SUM</span>(
+    <span class="tok-kw">CASE</span>
+      <span class="tok-kw">WHEN</span> material <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+      <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+    <span class="tok-kw">END</span>
+  ) <span class="tok-kw">AS</span> null_count,
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">SUM</span>(
+      <span class="tok-kw">CASE</span>
+        <span class="tok-kw">WHEN</span> material <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+      <span class="tok-kw">END</span>
+    ) * <span class="tok-num">100.0</span> / <span class="tok-kw">COUNT</span>(*),
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> null_percentage
+<span class="tok-kw">FROM</span>
+  products
+<span class="tok-kw">UNION ALL</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-string">&#x27;reviews&#x27;</span> <span class="tok-kw">AS</span> table_name,
+  <span class="tok-string">&#x27;review_text&#x27;</span> <span class="tok-kw">AS</span> column_name,
+  <span class="tok-kw">COUNT</span>(*) <span class="tok-kw">AS</span> total_rows,
+  <span class="tok-kw">SUM</span>(
+    <span class="tok-kw">CASE</span>
+      <span class="tok-kw">WHEN</span> review_text <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+      <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+    <span class="tok-kw">END</span>
+  ) <span class="tok-kw">AS</span> null_count,
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">SUM</span>(
+      <span class="tok-kw">CASE</span>
+        <span class="tok-kw">WHEN</span> review_text <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+      <span class="tok-kw">END</span>
+    ) * <span class="tok-num">100.0</span> / <span class="tok-kw">COUNT</span>(*),
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> null_percentage
+<span class="tok-kw">FROM</span>
+  reviews;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>table_name</th>
+            <th>column_name</th>
+            <th>total_rows</th>
+            <th>null_count</th>
+            <th>null_percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>customers</td>
+            <td>phone</td>
+            <td>800</td>
+            <td>40</td>
+            <td>5.0</td>
+        </tr>
+        <tr>
+            <td>products</td>
+            <td>material</td>
+            <td>300</td>
+            <td>9</td>
+            <td>3.0</td>
+        </tr>
+        <tr>
+            <td>reviews</td>
+            <td>review_text</td>
+            <td>1500</td>
+            <td>120</td>
+            <td>8.0</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Audit Findings (Nulls):</strong></p>
+<ul><li><strong>Customers (<code>phone</code>):</strong> 5.0% missing records (40 rows). This is acceptable for email-led campaigns, but we must use <code>COALESCE</code> or filter these out for SMS marketing lists.</li><li><strong>Products (<code>material</code>):</strong> 3.0% missing values (9 rows). Low impact, but requires a default label like <code>&#x27;Unknown&#x27;</code> during product mix analysis.</li><li><strong>Reviews (<code>review_text</code>):</strong> 8.0% missing text (120 rows). Normal e-commerce behavior (users frequently leave star ratings without writing a comment). No action needed.</li></ul></blockquote></div>
+      <div class="nb-md"><h3>🔍 Task 2: Duplicate Customer Records</h3>
+<p><strong>Business Question:</strong> Are there users creating multiple accounts with the same email address? <strong>Target Table:</strong> <code>customers</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  email,
+  <span class="tok-kw">COUNT</span>(customer_id) <span class="tok-kw">AS</span> account_count
+<span class="tok-kw">FROM</span>
+  customers
+<span class="tok-kw">GROUP BY</span>
+  email
+<span class="tok-kw">HAVING</span>
+  <span class="tok-kw">COUNT</span>(customer_id) &gt; <span class="tok-num">1</span>
+<span class="tok-kw">ORDER BY</span>
+  account_count <span class="tok-kw">DESC</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>email</th>
+            <th>account_count</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>wulansuryadi729@yahoo.com</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>baguspermata248@gmail.com</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>rinalestari281@outlook.com</td>
+            <td>2</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Audit Findings (Duplicates):</strong></p>
+<ul><li>Found 3 unique email addresses linked to multiple <code>customer_id</code>s (2 accounts each).</li><li><strong>Decision — no deduplication applied:</strong> These 3 duplicate emails represent 6 of 800 customer records (0.75%). Since RFM segmentation is directional rather than financial reporting, the effect on segment distribution is negligible. Retaining <code>customer_id</code> as the grain preserves the source system&#x27;s definition of a customer. Flagged for the data engineering team to resolve upstream.</li></ul></blockquote></div>
+      <div class="nb-md"><h3>🔍 Task 3: Product Category Standardization</h3>
+<p><strong>Business Question:</strong> Are product categories standardized, or is dirty data splitting our revenue groupings? <strong>Target Table:</strong> <code>products</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  category,
+  <span class="tok-kw">COUNT</span>(product_id) <span class="tok-kw">AS</span> total_products
+<span class="tok-kw">FROM</span>
+  products
+<span class="tok-kw">GROUP BY</span>
+  category
+<span class="tok-kw">ORDER BY</span>
+  category <span class="tok-kw">ASC</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>category</th>
+            <th>total_products</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Accessories</td>
+            <td>26</td>
+        </tr>
+        <tr>
+            <td>Aksesoris</td>
+            <td>26</td>
+        </tr>
+        <tr>
+            <td>Celana</td>
+            <td>24</td>
+        </tr>
+        <tr>
+            <td>Dress</td>
+            <td>30</td>
+        </tr>
+        <tr>
+            <td>Jacket</td>
+            <td>29</td>
+        </tr>
+        <tr>
+            <td>Jaket</td>
+            <td>27</td>
+        </tr>
+        <tr>
+            <td>Kaos</td>
+            <td>19</td>
+        </tr>
+        <tr>
+            <td>Kemeja</td>
+            <td>17</td>
+        </tr>
+        <tr>
+            <td>Pants</td>
+            <td>28</td>
+        </tr>
+        <tr>
+            <td>Shirt</td>
+            <td>16</td>
+        </tr>
+        <tr>
+            <td>T-Shirt</td>
+            <td>13</td>
+        </tr>
+        <tr>
+            <td>dress</td>
+            <td>18</td>
+        </tr>
+        <tr>
+            <td>kaos</td>
+            <td>12</td>
+        </tr>
+        <tr>
+            <td>kemeja</td>
+            <td>15</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Audit Findings (Category Inconsistencies):</strong></p>
+<ul><li>The <code>category</code> column contains 14 distinct values due to a mix of English and Indonesian terminology (e.g., <em>Aksesoris</em> vs <em>Accessories</em>) AND capitalization inconsistencies (e.g., <em>Dress</em> vs <em>dress</em>).</li><li><strong>Action Required:</strong> We must standardize these into 6 clean categories using a <code>CASE WHEN</code> mapping before calculating revenue metrics.</li></ul></blockquote></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-kw">CASE</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;aksesoris&#x27;</span>, <span class="tok-string">&#x27;accessories&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Accessories&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;celana&#x27;</span>, <span class="tok-string">&#x27;pants&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Pants&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;jaket&#x27;</span>, <span class="tok-string">&#x27;jacket&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Jacket&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;kemeja&#x27;</span>, <span class="tok-string">&#x27;shirt&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Shirt&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;kaos&#x27;</span>, <span class="tok-string">&#x27;t-shirt&#x27;</span>, <span class="tok-string">&#x27;tshirt&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;T-Shirt&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;dress&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Dress&#x27;</span>
+    <span class="tok-kw">ELSE</span> <span class="tok-string">&#x27;Other&#x27;</span>
+  <span class="tok-kw">END</span> <span class="tok-kw">AS</span> category_clean,
+  <span class="tok-kw">COUNT</span>(product_id) <span class="tok-kw">AS</span> total_products
+<span class="tok-kw">FROM</span>
+  products
+<span class="tok-kw">GROUP BY</span>
+  category_clean
+<span class="tok-kw">ORDER BY</span>
+  total_products <span class="tok-kw">DESC</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>category_clean</th>
+            <th>total_products</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Jacket</td>
+            <td>56</td>
+        </tr>
+        <tr>
+            <td>Accessories</td>
+            <td>52</td>
+        </tr>
+        <tr>
+            <td>Pants</td>
+            <td>52</td>
+        </tr>
+        <tr>
+            <td>Shirt</td>
+            <td>48</td>
+        </tr>
+        <tr>
+            <td>Dress</td>
+            <td>48</td>
+        </tr>
+        <tr>
+            <td>T-Shirt</td>
+            <td>44</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-comment">-- 1. Adding new column to store the clean category</span>
+<span class="tok-kw">ALTER</span> <span class="tok-kw">TABLE</span> products
+<span class="tok-kw">ADD</span> <span class="tok-kw">COLUMN</span> category_clean <span class="tok-kw">VARCHAR</span>;
+
+<span class="tok-comment">-- 2. Update the new column</span>
+<span class="tok-kw">UPDATE</span> products
+<span class="tok-kw">SET</span>
+  category_clean = <span class="tok-kw">CASE</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;aksesoris&#x27;</span>, <span class="tok-string">&#x27;accessories&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Accessories&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;celana&#x27;</span>, <span class="tok-string">&#x27;pants&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Pants&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;jaket&#x27;</span>, <span class="tok-string">&#x27;jacket&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Jacket&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;kemeja&#x27;</span>, <span class="tok-string">&#x27;shirt&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Shirt&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;kaos&#x27;</span>, <span class="tok-string">&#x27;t-shirt&#x27;</span>, <span class="tok-string">&#x27;tshirt&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;T-Shirt&#x27;</span>
+    <span class="tok-kw">WHEN</span> LOWER(category) <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;dress&#x27;</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;Dress&#x27;</span>
+    <span class="tok-kw">ELSE</span> <span class="tok-string">&#x27;Other&#x27;</span>
+  <span class="tok-kw">END</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>300</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-comment">-- 3. Verify </span>
+<span class="tok-kw">SELECT</span>
+  category_clean,
+  <span class="tok-kw">COUNT</span>(*) <span class="tok-kw">AS</span> <span class="tok-kw">COUNT</span>
+<span class="tok-kw">FROM</span>
+  products
+<span class="tok-kw">GROUP BY</span>
+  category_clean;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>category_clean</th>
+            <th>COUNT</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Shirt</td>
+            <td>48</td>
+        </tr>
+        <tr>
+            <td>Dress</td>
+            <td>48</td>
+        </tr>
+        <tr>
+            <td>Accessories</td>
+            <td>52</td>
+        </tr>
+        <tr>
+            <td>Jacket</td>
+            <td>56</td>
+        </tr>
+        <tr>
+            <td>Pants</td>
+            <td>52</td>
+        </tr>
+        <tr>
+            <td>T-Shirt</td>
+            <td>44</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><h3>🔍 Task 4: Data Integrity (Orphaned Records)</h3>
+<p><strong>Business Question:</strong> Are there any items sold in the <code>order_items</code> table that do not have a matching record in the <code>products</code> table? <strong>Target Tables:</strong> <code>order_items</code> (LEFT JOIN) <code>products</code></p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span>
+  <span class="tok-kw">COUNT</span>(*) <span class="tok-kw">AS</span> total_items_sold,
+  <span class="tok-kw">SUM</span>(
+    <span class="tok-kw">CASE</span>
+      <span class="tok-kw">WHEN</span> p.product_id <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+      <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+    <span class="tok-kw">END</span>
+  ) <span class="tok-kw">AS</span> orphaned_items,
+  <span class="tok-kw">ROUND</span>(
+    <span class="tok-kw">SUM</span>(
+      <span class="tok-kw">CASE</span>
+        <span class="tok-kw">WHEN</span> p.product_id <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-num">0</span>
+      <span class="tok-kw">END</span>
+    ) * <span class="tok-num">100.0</span> / <span class="tok-kw">COUNT</span>(*),
+    <span class="tok-num">2</span>
+  ) <span class="tok-kw">AS</span> orphaned_percentage
+<span class="tok-kw">FROM</span>
+  order_items oi
+  <span class="tok-kw">LEFT JOIN</span> products p <span class="tok-kw">ON</span> oi.product_id = p.product_id;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>total_items_sold</th>
+            <th>orphaned_items</th>
+            <th>orphaned_percentage</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>4986</td>
+            <td>0</td>
+            <td>0.0</td>
+        </tr>
+    </tbody>
+</table></div><div class="nb-table-wrap"><span style="None">Closing DuckDBPyConnection</span></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Audit Findings (Data Integrity):</strong></p>
+<ul><li><strong>Orphaned Records:</strong> 0% (0 out of 4,986 items sold).</li><li><strong>Conclusion:</strong> Excellent referential integrity between <code>order_items</code> and <code>products</code>. We can safely perform <code>INNER JOIN</code> operations for revenue and product-level calculations without dropping any sales data.</li></ul></blockquote>
+<hr>
+<p><strong>✅ Phase 1 (Data Quality Audit) Complete.</strong> The foundation is clean, standardized, and verified.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Renaldy Bilal Setyawan · <a href="../gayanara-ecommerce.html">Gayanara case study</a> · <a href="../../index.html">All projects</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

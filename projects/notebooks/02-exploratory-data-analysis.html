@@ -1,0 +1,1692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02. Exploratory Data Analysis &amp; Business Insights | Renaldy Bilal Setyawan</title>
+<meta name="description" content="Executed notebook: seven analytical tasks in SQL on the Gayanara e-commerce dataset, from revenue trend through cohort retention.">
+<meta name="author" content="Renaldy Bilal Setyawan">
+<meta name="robots" content="index, follow">
+
+<link rel="icon" type="image/png" href="../../assets/img/r.png">
+<link rel="apple-touch-icon" href="../../assets/img/r.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../../assets/css/style.css?v=2">
+<link rel="stylesheet" href="../../assets/css/notebook.css?v=1">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<svg class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="19" y1="12" x2="5" y2="12"></line>
+    <polyline points="12 19 5 12 12 5"></polyline>
+  </symbol>
+</svg>
+
+<header class="site-header case-header">
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="../../index.html" aria-label="Renaldy Bilal Setyawan — home">
+      <img src="../../assets/img/r.png" alt="" width="26" height="26">
+      <span aria-hidden="true">RBS</span>
+    </a>
+    <a class="case-back" href="../gayanara-ecommerce.html">
+      <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
+      Back to case study
+    </a>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="nb-hero graph-paper">
+    <div class="wrap">
+      <span class="eyebrow">Phase 2 · Exploratory Analysis</span>
+      <h1>02. Exploratory Data Analysis &amp; Business Insights</h1>
+      <p class="nb-hero-sub">Executed notebook: seven analytical tasks in SQL on the Gayanara e-commerce dataset, from revenue trend through cohort retention.</p>
+      <p class="nb-source">Source notebook: <code>02_Exploratory_Data_Analysis_EDA.ipynb</code> · rendered with saved cell outputs, exactly as executed.</p>
+      <div class="case-resource-links">
+        <a class="btn btn-secondary" href="../gayanara-ecommerce.html">Read the case study</a>
+        <a class="btn btn-secondary" href="../../downloads/gayanara/02_Exploratory_Data_Analysis_EDA.ipynb" download>Download .ipynb</a>
+        <a class="btn btn-secondary" href="https://github.com/renalazy/gayanara-ecommerce" target="_blank" rel="noopener">GitHub repo</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="nb-body">
+    <div class="wrap">
+      <div class="nb-md"><blockquote class="nb-callout"><p>⚠️ <strong>Note:</strong> This dataset is synthetically generated. Findings marked as data artifacts (Tasks 2 and 7) reflect the generating process, not business behavior.</p></blockquote></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-kw">import</span> duckdb, os
+
+<span class="tok-kw">if</span> <span class="tok-kw">not</span> os.path.exists(<span class="tok-string">&#x27;gayanara.db&#x27;</span>):
+    <span class="tok-kw">raise</span> FileNotFoundError(
+        <span class="tok-string">&quot;gayanara.db not found. Run 01_Data_Quality_Audit.ipynb first — &quot;</span>
+        <span class="tok-string">&quot;it ingests the raw CSVs and creates the database.&quot;</span>
+    )
+
+con = duckdb.connect(<span class="tok-string">&#x27;gayanara.db&#x27;</span>)
+
+<span class="tok-comment"># Load the SQL extension and bind the connection</span>
+<span class="tok-magic">%load_ext</span> sql
+<span class="tok-magic">%sql</span> con
+<span class="tok-magic">%config</span> SqlMagic.displaylimit = <span class="tok-num">50</span></code></pre></div></div>
+      <div class="nb-md"><h3>📈 Task 1: Macro Business Metrics (Revenue Trends)</h3>
+<p><strong>Business Question:</strong> What is our total net revenue, and how are order volume and average order value trending over time?</p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-comment">-- Aggregate to order level first: discount_amount_idr lives on the ORDER,</span>
+<span class="tok-comment">-- so joining to order_items would repeat it once per line item and</span>
+<span class="tok-comment">-- overstate total discounts. MAX() collapses it back to one value per order.</span>
+<span class="tok-kw">WITH</span> order_gross <span class="tok-kw">AS</span> (
+    <span class="tok-kw">SELECT</span> 
+        o.order_id,
+        <span class="tok-kw">DATE_TRUNC</span>(<span class="tok-string">&#x27;month&#x27;</span>, o.order_date) <span class="tok-kw">AS</span> order_month,
+        <span class="tok-kw">SUM</span>(oi.quantity) <span class="tok-kw">AS</span> units,
+        <span class="tok-kw">SUM</span>(oi.subtotal_idr) <span class="tok-kw">AS</span> gross_revenue,
+        <span class="tok-kw">MAX</span>(<span class="tok-kw">COALESCE</span>(o.discount_amount_idr, <span class="tok-num">0</span>)) <span class="tok-kw">AS</span> discount
+    <span class="tok-kw">FROM</span> orders o
+    <span class="tok-kw">JOIN</span> order_items oi <span class="tok-kw">ON</span> o.order_id = oi.order_id
+    <span class="tok-kw">WHERE</span> o.order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+    <span class="tok-kw">GROUP BY</span> o.order_id, order_month, o.discount_amount_idr
+)
+<span class="tok-kw">SELECT</span> 
+    order_month,
+    <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> total_orders,
+    <span class="tok-kw">SUM</span>(units) <span class="tok-kw">AS</span> total_units_sold,
+    <span class="tok-kw">SUM</span>(gross_revenue) <span class="tok-kw">AS</span> gross_revenue,
+    <span class="tok-kw">SUM</span>(discount) <span class="tok-kw">AS</span> total_discount,
+    <span class="tok-kw">SUM</span>(gross_revenue) - <span class="tok-kw">SUM</span>(discount) <span class="tok-kw">AS</span> net_revenue,
+    <span class="tok-kw">CAST</span>((<span class="tok-kw">SUM</span>(gross_revenue) - <span class="tok-kw">SUM</span>(discount)) / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> net_aov
+<span class="tok-kw">FROM</span> order_gross
+<span class="tok-kw">GROUP BY</span> order_month
+<span class="tok-kw">ORDER BY</span> order_month <span class="tok-kw">ASC</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>order_month</th>
+            <th>total_orders</th>
+            <th>total_units_sold</th>
+            <th>gross_revenue</th>
+            <th>total_discount</th>
+            <th>net_revenue</th>
+            <th>net_aov</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>2022-01-01</td>
+            <td>38</td>
+            <td>87</td>
+            <td>22273000</td>
+            <td>519690</td>
+            <td>21753310</td>
+            <td>572456</td>
+        </tr>
+        <tr>
+            <td>2022-02-01</td>
+            <td>23</td>
+            <td>53</td>
+            <td>11457000</td>
+            <td>211317</td>
+            <td>11245683</td>
+            <td>488943</td>
+        </tr>
+        <tr>
+            <td>2022-03-01</td>
+            <td>36</td>
+            <td>76</td>
+            <td>21584000</td>
+            <td>421508</td>
+            <td>21162492</td>
+            <td>587847</td>
+        </tr>
+        <tr>
+            <td>2022-04-01</td>
+            <td>35</td>
+            <td>92</td>
+            <td>19498000</td>
+            <td>458972</td>
+            <td>19039028</td>
+            <td>543972</td>
+        </tr>
+        <tr>
+            <td>2022-05-01</td>
+            <td>27</td>
+            <td>52</td>
+            <td>14658000</td>
+            <td>384283</td>
+            <td>14273717</td>
+            <td>528656</td>
+        </tr>
+        <tr>
+            <td>2022-06-01</td>
+            <td>32</td>
+            <td>60</td>
+            <td>10270000</td>
+            <td>344839</td>
+            <td>9925161</td>
+            <td>310161</td>
+        </tr>
+        <tr>
+            <td>2022-07-01</td>
+            <td>34</td>
+            <td>64</td>
+            <td>14946000</td>
+            <td>300164</td>
+            <td>14645836</td>
+            <td>430760</td>
+        </tr>
+        <tr>
+            <td>2022-08-01</td>
+            <td>28</td>
+            <td>59</td>
+            <td>10721000</td>
+            <td>441558</td>
+            <td>10279442</td>
+            <td>367123</td>
+        </tr>
+        <tr>
+            <td>2022-09-01</td>
+            <td>30</td>
+            <td>62</td>
+            <td>17658000</td>
+            <td>329384</td>
+            <td>17328616</td>
+            <td>577621</td>
+        </tr>
+        <tr>
+            <td>2022-10-01</td>
+            <td>33</td>
+            <td>82</td>
+            <td>20078000</td>
+            <td>449238</td>
+            <td>19628762</td>
+            <td>594811</td>
+        </tr>
+        <tr>
+            <td>2022-11-01</td>
+            <td>39</td>
+            <td>76</td>
+            <td>20624000</td>
+            <td>425243</td>
+            <td>20198757</td>
+            <td>517917</td>
+        </tr>
+        <tr>
+            <td>2022-12-01</td>
+            <td>34</td>
+            <td>76</td>
+            <td>19604000</td>
+            <td>329862</td>
+            <td>19274138</td>
+            <td>566886</td>
+        </tr>
+        <tr>
+            <td>2023-01-01</td>
+            <td>75</td>
+            <td>166</td>
+            <td>46754000</td>
+            <td>945280</td>
+            <td>45808720</td>
+            <td>610783</td>
+        </tr>
+        <tr>
+            <td>2023-02-01</td>
+            <td>58</td>
+            <td>121</td>
+            <td>27679000</td>
+            <td>778137</td>
+            <td>26900863</td>
+            <td>463808</td>
+        </tr>
+        <tr>
+            <td>2023-03-01</td>
+            <td>83</td>
+            <td>186</td>
+            <td>43864000</td>
+            <td>1235068</td>
+            <td>42628932</td>
+            <td>513602</td>
+        </tr>
+        <tr>
+            <td>2023-04-01</td>
+            <td>79</td>
+            <td>179</td>
+            <td>43811000</td>
+            <td>715515</td>
+            <td>43095485</td>
+            <td>545512</td>
+        </tr>
+        <tr>
+            <td>2023-05-01</td>
+            <td>89</td>
+            <td>180</td>
+            <td>44630000</td>
+            <td>1118589</td>
+            <td>43511411</td>
+            <td>488892</td>
+        </tr>
+        <tr>
+            <td>2023-06-01</td>
+            <td>79</td>
+            <td>170</td>
+            <td>38640000</td>
+            <td>809024</td>
+            <td>37830976</td>
+            <td>478873</td>
+        </tr>
+        <tr>
+            <td>2023-07-01</td>
+            <td>70</td>
+            <td>146</td>
+            <td>32734000</td>
+            <td>749505</td>
+            <td>31984495</td>
+            <td>456921</td>
+        </tr>
+        <tr>
+            <td>2023-08-01</td>
+            <td>72</td>
+            <td>146</td>
+            <td>32904000</td>
+            <td>772725</td>
+            <td>32131275</td>
+            <td>446268</td>
+        </tr>
+        <tr>
+            <td>2023-09-01</td>
+            <td>64</td>
+            <td>116</td>
+            <td>29494000</td>
+            <td>893849</td>
+            <td>28600151</td>
+            <td>446877</td>
+        </tr>
+        <tr>
+            <td>2023-10-01</td>
+            <td>71</td>
+            <td>156</td>
+            <td>37284000</td>
+            <td>967200</td>
+            <td>36316800</td>
+            <td>511504</td>
+        </tr>
+        <tr>
+            <td>2023-11-01</td>
+            <td>60</td>
+            <td>113</td>
+            <td>24367000</td>
+            <td>896921</td>
+            <td>23470079</td>
+            <td>391168</td>
+        </tr>
+        <tr>
+            <td>2023-12-01</td>
+            <td>71</td>
+            <td>163</td>
+            <td>36607000</td>
+            <td>1028590</td>
+            <td>35578410</td>
+            <td>501104</td>
+        </tr>
+        <tr>
+            <td>2024-01-01</td>
+            <td>83</td>
+            <td>176</td>
+            <td>43134000</td>
+            <td>1188830</td>
+            <td>41945170</td>
+            <td>505363</td>
+        </tr>
+        <tr>
+            <td>2024-02-01</td>
+            <td>106</td>
+            <td>212</td>
+            <td>50688000</td>
+            <td>1302877</td>
+            <td>49385123</td>
+            <td>465897</td>
+        </tr>
+        <tr>
+            <td>2024-03-01</td>
+            <td>69</td>
+            <td>155</td>
+            <td>33975000</td>
+            <td>938786</td>
+            <td>33036214</td>
+            <td>478786</td>
+        </tr>
+        <tr>
+            <td>2024-04-01</td>
+            <td>92</td>
+            <td>192</td>
+            <td>45998000</td>
+            <td>992866</td>
+            <td>45005134</td>
+            <td>489186</td>
+        </tr>
+        <tr>
+            <td>2024-05-01</td>
+            <td>102</td>
+            <td>201</td>
+            <td>54579000</td>
+            <td>1264020</td>
+            <td>53314980</td>
+            <td>522696</td>
+        </tr>
+        <tr>
+            <td>2024-06-01</td>
+            <td>80</td>
+            <td>187</td>
+            <td>38393000</td>
+            <td>1026827</td>
+            <td>37366173</td>
+            <td>467077</td>
+        </tr>
+        <tr>
+            <td>2024-07-01</td>
+            <td>83</td>
+            <td>173</td>
+            <td>42037000</td>
+            <td>1008636</td>
+            <td>41028364</td>
+            <td>494318</td>
+        </tr>
+        <tr>
+            <td>2024-08-01</td>
+            <td>73</td>
+            <td>186</td>
+            <td>44224000</td>
+            <td>1067895</td>
+            <td>43156105</td>
+            <td>591180</td>
+        </tr>
+        <tr>
+            <td>2024-09-01</td>
+            <td>78</td>
+            <td>179</td>
+            <td>40701000</td>
+            <td>1011934</td>
+            <td>39689066</td>
+            <td>508834</td>
+        </tr>
+        <tr>
+            <td>2024-10-01</td>
+            <td>91</td>
+            <td>191</td>
+            <td>43479000</td>
+            <td>1017597</td>
+            <td>42461403</td>
+            <td>466609</td>
+        </tr>
+        <tr>
+            <td>2024-11-01</td>
+            <td>88</td>
+            <td>203</td>
+            <td>46597000</td>
+            <td>1332512</td>
+            <td>45264488</td>
+            <td>514369</td>
+        </tr>
+        <tr>
+            <td>2024-12-01</td>
+            <td>82</td>
+            <td>177</td>
+            <td>42513000</td>
+            <td>928808</td>
+            <td>41584192</td>
+            <td>507124</td>
+        </tr>
+        <tr>
+            <td>2025-01-01</td>
+            <td>100</td>
+            <td>237</td>
+            <td>60283000</td>
+            <td>1093648</td>
+            <td>59189352</td>
+            <td>591894</td>
+        </tr>
+        <tr>
+            <td>2025-02-01</td>
+            <td>134</td>
+            <td>292</td>
+            <td>68028000</td>
+            <td>1725924</td>
+            <td>66302076</td>
+            <td>494792</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (Revenue Trend):</strong></p>
+<ul><li><strong>Revenue definition:</strong> Net revenue = sum of line-item subtotals minus order-level discounts, excluding cancelled and returned orders. Shipping is excluded as a pass-through cost. This reconciles exactly to <code>orders.total_amount_idr</code>.</li><li><strong>Strong growth:</strong> Monthly net revenue grew from ~17M IDR/month across 2022 to ~45M IDR/month in 2024, peaking at 68.0M IDR in February 2025 — roughly 3x growth over three years.</li><li><strong>Volume-led, not price-led:</strong> Monthly orders rose from ~32 in 2022 to ~100+ in 2024–25, while AOV shows no directional trend — it fluctuates between roughly 390k and 610k IDR with no upward movement. Early-period swings are amplified by small monthly order counts (23–39 orders). Growth is driven by customer acquisition, not by increasing spend per order.</li><li><strong>Caveat:</strong> February 2025 is the final month in the dataset and may be partial. The apparent spike should be confirmed before being read as a trend.</li></ul></blockquote></div>
+      <div class="nb-md"><h3>🏆 Task 2: Product Performance (Best-Selling Categories)</h3>
+<p><strong>Business Question:</strong> Which product categories drive the highest volume, and which drive the highest total revenue?</p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span> 
+    p.category_clean,
+    <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> oi.order_id) <span class="tok-kw">AS</span> total_orders,
+    <span class="tok-kw">SUM</span>(oi.quantity) <span class="tok-kw">AS</span> total_units_sold,
+    <span class="tok-kw">SUM</span>(oi.subtotal_idr) <span class="tok-kw">AS</span> gross_revenue,
+    <span class="tok-kw">CAST</span>(<span class="tok-kw">SUM</span>(oi.subtotal_idr) / <span class="tok-kw">SUM</span>(oi.quantity) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> avg_price_per_unit
+<span class="tok-kw">FROM</span> order_items oi
+<span class="tok-kw">JOIN</span> products p <span class="tok-kw">ON</span> oi.product_id = p.product_id
+<span class="tok-kw">JOIN</span> orders o <span class="tok-kw">ON</span> oi.order_id = o.order_id
+<span class="tok-kw">WHERE</span> o.order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+<span class="tok-kw">GROUP BY</span> p.category_clean
+<span class="tok-kw">ORDER BY</span> gross_revenue <span class="tok-kw">DESC</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>category_clean</th>
+            <th>total_orders</th>
+            <th>total_units_sold</th>
+            <th>gross_revenue</th>
+            <th>avg_price_per_unit</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Jacket</td>
+            <td>722</td>
+            <td>1026</td>
+            <td>223984000</td>
+            <td>218308</td>
+        </tr>
+        <tr>
+            <td>Pants</td>
+            <td>659</td>
+            <td>896</td>
+            <td>221044000</td>
+            <td>246701</td>
+        </tr>
+        <tr>
+            <td>Accessories</td>
+            <td>694</td>
+            <td>971</td>
+            <td>219999000</td>
+            <td>226570</td>
+        </tr>
+        <tr>
+            <td>Dress</td>
+            <td>614</td>
+            <td>874</td>
+            <td>219546000</td>
+            <td>251197</td>
+        </tr>
+        <tr>
+            <td>Shirt</td>
+            <td>588</td>
+            <td>824</td>
+            <td>216616000</td>
+            <td>262883</td>
+        </tr>
+        <tr>
+            <td>T-Shirt</td>
+            <td>618</td>
+            <td>851</td>
+            <td>195579000</td>
+            <td>229823</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (Category Performance):</strong></p>
+<ul><li><strong>Metric note:</strong> Revenue here is gross (line-item subtotals). Order-level discounts cannot be attributed to individual categories, so this sums to 1,296.8M IDR gross rather than the 1,265.3M net headline. The two reconcile exactly.</li><li><strong>Jackets lead on both axes:</strong> Jackets top both units sold (1,026) and gross revenue (224.0M IDR) — despite having the <em>lowest</em> average price per unit (218k IDR). Their revenue lead is purely volume-driven.</li><li><strong>Price and revenue are decoupled:</strong> Shirts command the highest average unit price (263k IDR) but rank 5th in revenue. High price does not compensate for lower volume in this catalog.</li><li><strong>Exceptionally flat distribution:</strong> All six categories fall between 195.6M and 224.0M IDR — a 14% spread between best and worst. No category carries the business, and none is a clear laggard.</li><li><strong>Actionable takeaway:</strong> The flat distribution is unusual and worth interrogating rather than celebrating. In a real catalog it would suggest either genuinely balanced demand or an artifact of how the assortment was constructed. Merchandising should confirm which before treating it as diversification strength.</li></ul></blockquote></div>
+      <div class="nb-md"><p><strong>Threshold rationale:</strong> Cutoffs are business rules, benchmarked against the observed distribution (median recency 145 days; median frequency 4 orders; median lifetime spend 1.69M IDR; p90 frequency 6 orders; p90 spend 3.66M IDR):</p>
+<ul><li><strong>Champions — recency ≤ 60 days:</strong> Deliberately stricter than the median recency of 145 days. The intent is a small, high-confidence list marketing can act on, not a balanced split.</li><li><strong>Champions — frequency ≥ 5 and monetary ≥ 4M IDR:</strong> Frequency 5 sits between the median (4) and p90 (6); the 4M spend threshold sits just above p90 (3.66M). Combined with the recency rule, this yields 26 customers — roughly the top 3%.</li><li><strong>Lost — recency ≥ 120 days:</strong> Below the median recency of 145 days, so by construction more than half the base falls here (343 of 787). This reflects a real retention problem, but the threshold amplifies it. A 180-day cutoff would produce a more conservative count.</li></ul>
+<p><strong>Limitation:</strong> These are fixed rules, not statistical clusters. The Lost threshold in particular is doing definitional work — the segment is large partly because the cutoff is set below median recency. A quantile-based RFM scoring approach (1–5 per dimension) would adapt as the base grows and avoid this. Fixed thresholds were chosen for interpretability by non-technical stakeholders.</p></div>
+      <div class="nb-md"><h3>👥 Task 3: Customer Segmentation (RFM Base Metrics)</h3>
+<p><strong>Business Question:</strong> Who are our most valuable customers based on Recency, Frequency, and Monetary (RFM) spending habits?</p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">WITH</span> rfm_base <span class="tok-kw">AS</span> (
+    <span class="tok-kw">SELECT</span> 
+        c.email,
+        <span class="tok-kw">CAST</span>((<span class="tok-kw">SELECT</span> <span class="tok-kw">MAX</span>(order_date) <span class="tok-kw">FROM</span> orders) <span class="tok-kw">AS</span> <span class="tok-kw">DATE</span>) - <span class="tok-kw">CAST</span>(<span class="tok-kw">MAX</span>(o.order_date) <span class="tok-kw">AS</span> <span class="tok-kw">DATE</span>) <span class="tok-kw">AS</span> recency_days,
+        <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> o.order_id) <span class="tok-kw">AS</span> frequency,
+        <span class="tok-kw">SUM</span>(o.total_amount_idr) <span class="tok-kw">AS</span> monetary_value
+    <span class="tok-kw">FROM</span> orders o
+    <span class="tok-kw">JOIN</span> customers c <span class="tok-kw">ON</span> o.customer_id = c.customer_id
+    <span class="tok-kw">GROUP BY</span> o.customer_id, c.email
+)
+<span class="tok-kw">SELECT</span> 
+    <span class="tok-kw">MEDIAN</span>(recency_days) <span class="tok-kw">AS</span> median_recency,
+    <span class="tok-kw">QUANTILE_CONT</span>(frequency, <span class="tok-num">0.9</span>) <span class="tok-kw">AS</span> p90_frequency,
+    <span class="tok-kw">QUANTILE_CONT</span>(monetary_value, <span class="tok-num">0.9</span>) <span class="tok-kw">AS</span> p90_monetary,
+    <span class="tok-kw">MEDIAN</span>(frequency) <span class="tok-kw">AS</span> median_freq,
+    <span class="tok-kw">MEDIAN</span>(monetary_value) <span class="tok-kw">AS</span> median_monetary
+<span class="tok-kw">FROM</span> rfm_base;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>median_recency</th>
+            <th>p90_frequency</th>
+            <th>p90_monetary</th>
+            <th>median_freq</th>
+            <th>median_monetary</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>145.0</td>
+            <td>6.0</td>
+            <td>3655976.1999999997</td>
+            <td>4.0</td>
+            <td>1690074.0</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (RFM Baselines):</strong></p>
+<ul><li><strong>The base is cold:</strong> Median recency across all 787 customers is 145 days — the typical customer last purchased nearly five months ago. This is the most important number in the segmentation: the problem isn&#x27;t identifying at-risk VIPs, it&#x27;s that dormancy is the default state.</li><li><strong>High-Value Churn Risk:</strong> Our #1 highest-spending customer has not made a purchase in 129 days. Another top-10 spender hasn&#x27;t purchased in 229 days.</li><li><strong>The Goal:</strong> We need to move away from raw lists and segment these customers into actionable tiers (e.g., &quot;Champions&quot; vs. &quot;At Risk&quot;) so the marketing team can run targeted re-engagement campaigns.</li></ul></blockquote></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">WITH</span> rfm_base <span class="tok-kw">AS</span> (
+    <span class="tok-kw">SELECT</span> 
+        c.email,
+        <span class="tok-kw">CAST</span>((<span class="tok-kw">SELECT</span> <span class="tok-kw">MAX</span>(order_date) <span class="tok-kw">FROM</span> orders) <span class="tok-kw">AS</span> <span class="tok-kw">DATE</span>) - <span class="tok-kw">CAST</span>(<span class="tok-kw">MAX</span>(o.order_date) <span class="tok-kw">AS</span> <span class="tok-kw">DATE</span>) <span class="tok-kw">AS</span> recency_days,
+        <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> o.order_id) <span class="tok-kw">AS</span> frequency,
+        <span class="tok-kw">SUM</span>(o.total_amount_idr) <span class="tok-kw">AS</span> monetary_value
+    <span class="tok-kw">FROM</span> orders o
+    <span class="tok-kw">JOIN</span> customers c <span class="tok-kw">ON</span> o.customer_id = c.customer_id
+    <span class="tok-kw">GROUP BY</span> o.customer_id, c.email
+)
+<span class="tok-kw">SELECT</span> 
+    email,
+    recency_days,
+    frequency, 
+    monetary_value,
+    <span class="tok-kw">CASE</span> 
+        <span class="tok-kw">WHEN</span> recency_days &lt;= <span class="tok-num">60</span> <span class="tok-kw">AND</span> frequency &gt;= <span class="tok-num">5</span> <span class="tok-kw">AND</span> monetary_value &gt;= <span class="tok-num">4000000</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;🏆 Champions&#x27;</span>
+        <span class="tok-kw">WHEN</span> recency_days &gt; <span class="tok-num">60</span> <span class="tok-kw">AND</span> (frequency &gt;= <span class="tok-num">5</span> <span class="tok-kw">OR</span> monetary_value &gt;= <span class="tok-num">4000000</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;⚠️ At Risk (VIPs)&#x27;</span>
+        <span class="tok-kw">WHEN</span> recency_days &lt;= <span class="tok-num">30</span> <span class="tok-kw">AND</span> frequency &lt; <span class="tok-num">3</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;👋 New / Promising&#x27;</span>
+        <span class="tok-kw">WHEN</span> recency_days &gt;= <span class="tok-num">120</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;💤 Lost / Inactive&#x27;</span>
+        <span class="tok-kw">ELSE</span> <span class="tok-string">&#x27;🛒 Regulars&#x27;</span>
+    <span class="tok-kw">END</span> <span class="tok-kw">AS</span> customer_segment
+<span class="tok-kw">FROM</span> rfm_base
+<span class="tok-kw">ORDER BY</span> monetary_value <span class="tok-kw">DESC</span>
+<span class="tok-kw">LIMIT</span> <span class="tok-num">15</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>email</th>
+            <th>recency_days</th>
+            <th>frequency</th>
+            <th>monetary_value</th>
+            <th>customer_segment</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>dewihutapea591@yahoo.com</td>
+            <td>129</td>
+            <td>6</td>
+            <td>7803360</td>
+            <td>⚠️ At Risk (VIPs)</td>
+        </tr>
+        <tr>
+            <td>hadifauzi621@yahoo.com</td>
+            <td>5</td>
+            <td>7</td>
+            <td>6615921</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>yogaiskandar656@gmail.com</td>
+            <td>56</td>
+            <td>7</td>
+            <td>6108037</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>ekosaputra985@gmail.com</td>
+            <td>154</td>
+            <td>8</td>
+            <td>5907000</td>
+            <td>⚠️ At Risk (VIPs)</td>
+        </tr>
+        <tr>
+            <td>putrapermata695@outlook.com</td>
+            <td>9</td>
+            <td>10</td>
+            <td>5733033</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>anggimanurung116@gmail.com</td>
+            <td>27</td>
+            <td>8</td>
+            <td>5109045</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>hanasimbolon349@yahoo.com</td>
+            <td>229</td>
+            <td>3</td>
+            <td>5034443</td>
+            <td>⚠️ At Risk (VIPs)</td>
+        </tr>
+        <tr>
+            <td>dionsiregar730@gmail.com</td>
+            <td>19</td>
+            <td>8</td>
+            <td>4912003</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>vivilestari325@gmail.com</td>
+            <td>24</td>
+            <td>9</td>
+            <td>4865145</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>adityasiregar323@yahoo.com</td>
+            <td>39</td>
+            <td>6</td>
+            <td>4851218</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>nadiarahmawati470@gmail.com</td>
+            <td>26</td>
+            <td>6</td>
+            <td>4836144</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>ratnahidayat818@gmail.com</td>
+            <td>98</td>
+            <td>9</td>
+            <td>4758611</td>
+            <td>⚠️ At Risk (VIPs)</td>
+        </tr>
+        <tr>
+            <td>rendisantoso180@gmail.com</td>
+            <td>69</td>
+            <td>6</td>
+            <td>4757048</td>
+            <td>⚠️ At Risk (VIPs)</td>
+        </tr>
+        <tr>
+            <td>indrautami201@gmail.com</td>
+            <td>0</td>
+            <td>8</td>
+            <td>4634423</td>
+            <td>🏆 Champions</td>
+        </tr>
+        <tr>
+            <td>shintapermata68@yahoo.com</td>
+            <td>41</td>
+            <td>4</td>
+            <td>4612940</td>
+            <td>🛒 Regulars</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (RFM Segmentation):</strong></p>
+<ul><li><strong>Rule-based segmentation:</strong> Fixed thresholds map customers to named tiers that marketing can act on directly, at the cost of adaptability (see threshold rationale above). The trade-off favors interpretability over statistical rigor.</li><li><strong>Actionable Takeaway:</strong> Top spenders who have gone dormant (like our #1 customer at 129 days without a purchase) are now correctly flagged as <strong>⚠️ At Risk (VIPs)</strong> instead of Champions. Marketing can instantly export this specific segment to run aggressive, highly-targeted win-back campaigns.</li></ul></blockquote></div>
+      <div class="nb-md"><h3>🗺️ Task 4: Geospatial Revenue Map &amp; AOV (Hidden Gems)</h3>
+<p><strong>Business Question:</strong> Which cities deserve more ad budget? Are there high-value markets outside the major metropolitan areas that yield a higher Average Order Value (AOV)?</p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span> 
+    shipping_province,
+    shipping_city,
+    <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> total_orders,
+    <span class="tok-kw">SUM</span>(total_amount_idr) <span class="tok-kw">AS</span> total_revenue,
+    <span class="tok-kw">CAST</span>(<span class="tok-kw">SUM</span>(total_amount_idr) / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> average_order_value
+<span class="tok-kw">FROM</span> orders
+<span class="tok-kw">WHERE</span> order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+<span class="tok-kw">GROUP BY</span> shipping_province, shipping_city
+<span class="tok-kw">ORDER BY</span> total_revenue <span class="tok-kw">DESC</span>
+<span class="tok-kw">LIMIT</span> <span class="tok-num">15</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>shipping_province</th>
+            <th>shipping_city</th>
+            <th>total_orders</th>
+            <th>total_revenue</th>
+            <th>average_order_value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Jawa Tengah</td>
+            <td>Semarang</td>
+            <td>141</td>
+            <td>76571616</td>
+            <td>543061</td>
+        </tr>
+        <tr>
+            <td>Jawa Barat</td>
+            <td>Depok</td>
+            <td>150</td>
+            <td>75974249</td>
+            <td>506495</td>
+        </tr>
+        <tr>
+            <td>Sumatera Utara</td>
+            <td>Medan</td>
+            <td>155</td>
+            <td>75476440</td>
+            <td>486945</td>
+        </tr>
+        <tr>
+            <td>Jawa Barat</td>
+            <td>Bekasi</td>
+            <td>151</td>
+            <td>69672371</td>
+            <td>461406</td>
+        </tr>
+        <tr>
+            <td>Sulawesi Utara</td>
+            <td>Manado</td>
+            <td>138</td>
+            <td>69199639</td>
+            <td>501447</td>
+        </tr>
+        <tr>
+            <td>Sulawesi Selatan</td>
+            <td>Makassar</td>
+            <td>138</td>
+            <td>67318630</td>
+            <td>487816</td>
+        </tr>
+        <tr>
+            <td>Kalimantan Barat</td>
+            <td>Pontianak</td>
+            <td>148</td>
+            <td>67128230</td>
+            <td>453569</td>
+        </tr>
+        <tr>
+            <td>Banten</td>
+            <td>Tangerang</td>
+            <td>132</td>
+            <td>66851296</td>
+            <td>506449</td>
+        </tr>
+        <tr>
+            <td>Jawa Timur</td>
+            <td>Surabaya</td>
+            <td>112</td>
+            <td>65661283</td>
+            <td>586261</td>
+        </tr>
+        <tr>
+            <td>Kalimantan Timur</td>
+            <td>Balikpapan</td>
+            <td>124</td>
+            <td>64958371</td>
+            <td>523858</td>
+        </tr>
+        <tr>
+            <td>Sumatera Selatan</td>
+            <td>Palembang</td>
+            <td>121</td>
+            <td>62435966</td>
+            <td>516000</td>
+        </tr>
+        <tr>
+            <td>Sumatera Barat</td>
+            <td>Padang</td>
+            <td>124</td>
+            <td>62141833</td>
+            <td>501144</td>
+        </tr>
+        <tr>
+            <td>Jawa Timur</td>
+            <td>Malang</td>
+            <td>147</td>
+            <td>61896178</td>
+            <td>421062</td>
+        </tr>
+        <tr>
+            <td>Jawa Barat</td>
+            <td>Bandung</td>
+            <td>122</td>
+            <td>61303115</td>
+            <td>502485</td>
+        </tr>
+        <tr>
+            <td>Kalimantan Selatan</td>
+            <td>Banjarmasin</td>
+            <td>105</td>
+            <td>61252354</td>
+            <td>583356</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (Geospatial Analysis):</strong></p>
+<ul><li><strong>Top Revenue Driver:</strong> Semarang (Jawa Tengah) leads the pack in total revenue (~76.5M IDR), closely followed by Depok and Medan.</li><li><strong>The &quot;Hidden Gems&quot;:</strong> <strong>Surabaya (Jawa Timur)</strong> and <strong>Banjarmasin (Kalimantan Selatan)</strong> are the standout markets for profitability. Despite having lower order volumes (112 and 105 respectively), they boast the highest Average Order Values in the top 15 (Surabaya at 586k IDR and Banjarmasin at 583k IDR).</li><li><strong>Actionable Takeaway:</strong> Marketing should allocate specific, high-end product ad spend to Surabaya and Banjarmasin, as customers in these regions are clearly willing to add more expensive items (or larger quantities) to their carts.</li></ul></blockquote></div>
+      <div class="nb-md"><h3>💸 Task 5: Promo Code Impact Evaluation</h3>
+<p><strong>Business Question:</strong> Do promo codes actually incentivize higher spending (higher AOV), or are we just giving away discounts to people who would have bought anyway?</p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span> 
+    <span class="tok-kw">CASE</span> 
+        <span class="tok-kw">WHEN</span> promo_code <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;No Promo&#x27;</span> 
+        <span class="tok-kw">ELSE</span> <span class="tok-string">&#x27;Used Promo&#x27;</span> 
+    <span class="tok-kw">END</span> <span class="tok-kw">AS</span> promo_status,
+    <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> total_orders,
+    <span class="tok-kw">SUM</span>(total_amount_idr) <span class="tok-kw">AS</span> net_revenue,
+    <span class="tok-kw">SUM</span>(<span class="tok-kw">COALESCE</span>(discount_amount_idr, <span class="tok-num">0</span>)) <span class="tok-kw">AS</span> total_discount_given,
+    <span class="tok-kw">CAST</span>(<span class="tok-kw">SUM</span>(total_amount_idr + <span class="tok-kw">COALESCE</span>(discount_amount_idr, <span class="tok-num">0</span>)) 
+         / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> gross_aov,
+    <span class="tok-kw">CAST</span>(<span class="tok-kw">SUM</span>(total_amount_idr) / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> net_aov
+<span class="tok-kw">FROM</span> orders
+<span class="tok-kw">WHERE</span> order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+<span class="tok-kw">GROUP BY</span> promo_status;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>promo_status</th>
+            <th>total_orders</th>
+            <th>net_revenue</th>
+            <th>total_discount_given</th>
+            <th>gross_aov</th>
+            <th>net_aov</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Used Promo</td>
+            <td>1025</td>
+            <td>496651379</td>
+            <td>31427621</td>
+            <td>515199</td>
+            <td>484538</td>
+        </tr>
+        <tr>
+            <td>No Promo</td>
+            <td>1496</td>
+            <td>768689000</td>
+            <td>0</td>
+            <td>513830</td>
+            <td>513830</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (Promo Impact):</strong></p>
+<ul><li><strong>Methodology note:</strong> A naive comparison of <code>total_amount_idr</code> shows promo orders with a lower AOV (484k vs 514k IDR). This is misleading — <code>total_amount_idr</code> is recorded <em>net of discount</em>, so the discount is being subtracted from promo orders and then read as smaller baskets. The correct comparison adds the discount back to measure actual cart size.</li><li><strong>No measurable lift:</strong> On a like-for-like gross basis, promo orders average 515k IDR versus 514k IDR for organic orders — a 0.3% difference, effectively zero.</li><li><strong>The real problem:</strong> The company spent 31.4M IDR on discounts and generated no incremental basket growth. Promos are subsidizing purchases that would likely have happened anyway, rather than driving additional spend.</li><li><strong>Actionable Takeaway:</strong> Shift from unconditional flat discounts to threshold-based promos (e.g., &quot;Save 50k on orders above 600k&quot;), which structurally require a larger basket to unlock the discount.</li><li><strong>Limitation:</strong> This is an observational comparison, not a controlled test. Customers who choose to use promos may differ systematically from those who don&#x27;t. A holdout A/B test would be required to establish true incrementality.</li></ul></blockquote></div>
+      <div class="nb-md"><h3>🚚 Task 6: Courier Return &amp; Cancellation Rates</h3>
+<p><strong>Business Question:</strong> Which couriers have the highest return and cancellation rates? Is there a specific logistics partner causing fulfillment issues?</p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">SELECT</span> 
+    courier,
+    <span class="tok-kw">COUNT</span>(order_id) <span class="tok-kw">AS</span> total_orders,
+    <span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;returned&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) <span class="tok-kw">AS</span> returned_orders,
+    <span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;cancelled&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) <span class="tok-kw">AS</span> cancelled_orders,
+    <span class="tok-kw">ROUND</span>(<span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;returned&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1.0</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) / <span class="tok-kw">COUNT</span>(order_id) * <span class="tok-num">100</span>, <span class="tok-num">2</span>) <span class="tok-kw">AS</span> return_rate_pct,
+    <span class="tok-kw">ROUND</span>(<span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;cancelled&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1.0</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) / <span class="tok-kw">COUNT</span>(order_id) * <span class="tok-num">100</span>, <span class="tok-num">2</span>) <span class="tok-kw">AS</span> cancel_rate_pct
+<span class="tok-kw">FROM</span> orders
+<span class="tok-kw">GROUP BY</span> courier
+<span class="tok-kw">ORDER BY</span> return_rate_pct <span class="tok-kw">DESC</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>courier</th>
+            <th>total_orders</th>
+            <th>returned_orders</th>
+            <th>cancelled_orders</th>
+            <th>return_rate_pct</th>
+            <th>cancel_rate_pct</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Pos Indonesia</td>
+            <td>161</td>
+            <td>11</td>
+            <td>12</td>
+            <td>6.83</td>
+            <td>7.45</td>
+        </tr>
+        <tr>
+            <td>J&T</td>
+            <td>896</td>
+            <td>54</td>
+            <td>111</td>
+            <td>6.03</td>
+            <td>12.39</td>
+        </tr>
+        <tr>
+            <td>JNE</td>
+            <td>845</td>
+            <td>43</td>
+            <td>84</td>
+            <td>5.09</td>
+            <td>9.94</td>
+        </tr>
+        <tr>
+            <td>SiCepat</td>
+            <td>791</td>
+            <td>35</td>
+            <td>77</td>
+            <td>4.42</td>
+            <td>9.73</td>
+        </tr>
+        <tr>
+            <td>Anteraja</td>
+            <td>307</td>
+            <td>8</td>
+            <td>44</td>
+            <td>2.61</td>
+            <td>14.33</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (Courier Evaluation):</strong></p>
+<ul><li><strong>Cancellation spread:</strong> Anteraja shows the highest cancellation rate (14.33%, 44 of 307 orders), against a fleet average near 10%. J&amp;T is second (12.39%).</li><li><strong>Sample size caveat:</strong> Anteraja (307 orders) and Pos Indonesia (161 orders) carry far less volume than J&amp;T (896), JNE (845), and SiCepat (791). With 44 cancellation events, Anteraja&#x27;s rate carries meaningful uncertainty — the gap versus J&amp;T is suggestive, not conclusive.</li><li><strong>Counter-signal:</strong> Anteraja has the <em>lowest</em> return rate (2.61%) of all five couriers. Whatever drives cancellations does not appear to affect delivery quality, which points toward pre-dispatch issues (slow pickup, poor tracking) rather than handling damage.</li><li><strong>Actionable takeaway:</strong> Rather than suspending a partner on this evidence, audit Anteraja&#x27;s pickup-to-dispatch times and run a controlled volume shift in one region, measuring cancellation rate before and after. Escalate to contract renegotiation only if the gap persists at higher volume.</li></ul></blockquote></div>
+      <div class="nb-md"><h3>🔄 Task 7: Cohort Retention Analysis</h3>
+<p><strong>Business Question:</strong> How loyal are our customers? If a user makes their first purchase in a specific month, what percentage of those users return to buy again in the following months?</p></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">WITH</span> first_purchases <span class="tok-kw">AS</span> (
+    <span class="tok-comment">-- Step 1: First month a customer made a completed purchase.</span>
+    <span class="tok-comment">-- Status filter matters: without it, a cancelled order can define</span>
+    <span class="tok-comment">-- the cohort month, and cancelled orders count as &quot;retention&quot;.</span>
+    <span class="tok-kw">SELECT</span> 
+        customer_id,
+        <span class="tok-kw">DATE_TRUNC</span>(<span class="tok-string">&#x27;month&#x27;</span>, <span class="tok-kw">MIN</span>(order_date)) <span class="tok-kw">AS</span> cohort_month
+    <span class="tok-kw">FROM</span> orders
+    <span class="tok-kw">WHERE</span> order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+    <span class="tok-kw">GROUP BY</span> customer_id
+),
+cohort_data <span class="tok-kw">AS</span> (
+    <span class="tok-comment">-- Step 2: All subsequent completed purchase months</span>
+    <span class="tok-kw">SELECT</span>
+        f.cohort_month,
+        <span class="tok-kw">DATE_TRUNC</span>(<span class="tok-string">&#x27;month&#x27;</span>, o.order_date) <span class="tok-kw">AS</span> activity_month,
+        o.customer_id
+    <span class="tok-kw">FROM</span> orders o
+    <span class="tok-kw">JOIN</span> first_purchases f <span class="tok-kw">ON</span> o.customer_id = f.customer_id
+    <span class="tok-kw">WHERE</span> o.order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+),
+cohort_sizes <span class="tok-kw">AS</span> (
+    <span class="tok-comment">-- Step 3: Original size of each cohort</span>
+    <span class="tok-kw">SELECT</span> cohort_month, <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> customer_id) <span class="tok-kw">AS</span> initial_customers
+    <span class="tok-kw">FROM</span> first_purchases
+    <span class="tok-kw">GROUP BY</span> cohort_month
+),
+retention_counts <span class="tok-kw">AS</span> (
+    <span class="tok-comment">-- Step 4: Month index and active customers per cohort</span>
+    <span class="tok-kw">SELECT</span>
+        c.cohort_month,
+        <span class="tok-kw">DATE_DIFF</span>(<span class="tok-string">&#x27;month&#x27;</span>, c.cohort_month, c.activity_month) <span class="tok-kw">AS</span> month_index,
+        <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> c.customer_id) <span class="tok-kw">AS</span> active_customers
+    <span class="tok-kw">FROM</span> cohort_data c
+    <span class="tok-kw">GROUP BY</span> c.cohort_month, month_index
+)
+<span class="tok-kw">SELECT</span>
+    <span class="tok-kw">STRFTIME</span>(r.cohort_month, <span class="tok-string">&#x27;%Y-%m&#x27;</span>) <span class="tok-kw">AS</span> cohort_month,
+    s.initial_customers,
+    r.month_index,
+    r.active_customers,
+    <span class="tok-kw">ROUND</span>((r.active_customers * <span class="tok-num">100.0</span>) / s.initial_customers, <span class="tok-num">2</span>) <span class="tok-kw">AS</span> retention_pct
+<span class="tok-kw">FROM</span> retention_counts r
+<span class="tok-kw">JOIN</span> cohort_sizes s <span class="tok-kw">ON</span> r.cohort_month = s.cohort_month
+<span class="tok-kw">ORDER BY</span> r.cohort_month <span class="tok-kw">ASC</span>, r.month_index <span class="tok-kw">ASC</span>;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>cohort_month</th>
+            <th>initial_customers</th>
+            <th>month_index</th>
+            <th>active_customers</th>
+            <th>retention_pct</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>0</td>
+            <td>37</td>
+            <td>100.0</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>1</td>
+            <td>1</td>
+            <td>2.7</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>2</td>
+            <td>2</td>
+            <td>5.41</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>3</td>
+            <td>1</td>
+            <td>2.7</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>4</td>
+            <td>1</td>
+            <td>2.7</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>5</td>
+            <td>2</td>
+            <td>5.41</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>6</td>
+            <td>2</td>
+            <td>5.41</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>7</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>9</td>
+            <td>1</td>
+            <td>2.7</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>11</td>
+            <td>5</td>
+            <td>13.51</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>12</td>
+            <td>5</td>
+            <td>13.51</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>13</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>14</td>
+            <td>7</td>
+            <td>18.92</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>15</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>16</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>17</td>
+            <td>7</td>
+            <td>18.92</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>18</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>19</td>
+            <td>5</td>
+            <td>13.51</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>20</td>
+            <td>4</td>
+            <td>10.81</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>22</td>
+            <td>1</td>
+            <td>2.7</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>23</td>
+            <td>2</td>
+            <td>5.41</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>24</td>
+            <td>1</td>
+            <td>2.7</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>25</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>26</td>
+            <td>2</td>
+            <td>5.41</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>27</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>28</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>29</td>
+            <td>2</td>
+            <td>5.41</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>30</td>
+            <td>5</td>
+            <td>13.51</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>31</td>
+            <td>3</td>
+            <td>8.11</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>32</td>
+            <td>6</td>
+            <td>16.22</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>33</td>
+            <td>2</td>
+            <td>5.41</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>34</td>
+            <td>5</td>
+            <td>13.51</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>35</td>
+            <td>5</td>
+            <td>13.51</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>36</td>
+            <td>6</td>
+            <td>16.22</td>
+        </tr>
+        <tr>
+            <td>2022-01</td>
+            <td>37</td>
+            <td>37</td>
+            <td>1</td>
+            <td>2.7</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>0</td>
+            <td>22</td>
+            <td>100.0</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>1</td>
+            <td>1</td>
+            <td>4.55</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>3</td>
+            <td>1</td>
+            <td>4.55</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>6</td>
+            <td>3</td>
+            <td>13.64</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>7</td>
+            <td>1</td>
+            <td>4.55</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>8</td>
+            <td>1</td>
+            <td>4.55</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>9</td>
+            <td>1</td>
+            <td>4.55</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>10</td>
+            <td>1</td>
+            <td>4.55</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>11</td>
+            <td>6</td>
+            <td>27.27</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>12</td>
+            <td>2</td>
+            <td>9.09</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>13</td>
+            <td>3</td>
+            <td>13.64</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>14</td>
+            <td>3</td>
+            <td>13.64</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>15</td>
+            <td>5</td>
+            <td>22.73</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>16</td>
+            <td>4</td>
+            <td>18.18</td>
+        </tr>
+        <tr>
+            <td>2022-02</td>
+            <td>22</td>
+            <td>17</td>
+            <td>3</td>
+            <td>13.64</td>
+        </tr>
+    </tbody>
+</table>
+<span style="font-style:italic;text-align:center;">Truncated to <a href="https://jupysql.ploomber.io/en/latest/api/configuration.html#displaylimit">displaylimit</a> of 50.</span></div></div></div></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">WITH</span> first_purchases <span class="tok-kw">AS</span> (
+    <span class="tok-kw">SELECT</span> customer_id, <span class="tok-kw">DATE_TRUNC</span>(<span class="tok-string">&#x27;month&#x27;</span>, <span class="tok-kw">MIN</span>(order_date)) <span class="tok-kw">AS</span> cohort_month
+    <span class="tok-kw">FROM</span> orders <span class="tok-kw">WHERE</span> order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+    <span class="tok-kw">GROUP BY</span> customer_id
+),
+cohort_data <span class="tok-kw">AS</span> (
+    <span class="tok-kw">SELECT</span> f.cohort_month, <span class="tok-kw">DATE_TRUNC</span>(<span class="tok-string">&#x27;month&#x27;</span>, o.order_date) <span class="tok-kw">AS</span> activity_month, o.customer_id
+    <span class="tok-kw">FROM</span> orders o <span class="tok-kw">JOIN</span> first_purchases f <span class="tok-kw">ON</span> o.customer_id = f.customer_id
+    <span class="tok-kw">WHERE</span> o.order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+),
+cohort_sizes <span class="tok-kw">AS</span> (
+    <span class="tok-kw">SELECT</span> cohort_month, <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> customer_id) <span class="tok-kw">AS</span> initial_customers
+    <span class="tok-kw">FROM</span> first_purchases <span class="tok-kw">GROUP BY</span> cohort_month
+),
+retention_counts <span class="tok-kw">AS</span> (
+    <span class="tok-kw">SELECT</span> c.cohort_month,
+           <span class="tok-kw">DATE_DIFF</span>(<span class="tok-string">&#x27;month&#x27;</span>, c.cohort_month, c.activity_month) <span class="tok-kw">AS</span> month_index,
+           <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> c.customer_id) <span class="tok-kw">AS</span> active_customers
+    <span class="tok-kw">FROM</span> cohort_data c <span class="tok-kw">GROUP BY</span> c.cohort_month, month_index
+)
+<span class="tok-comment">-- Weighted average retention by month index, pooled across all cohorts</span>
+<span class="tok-kw">SELECT</span> 
+    r.month_index,
+    <span class="tok-kw">SUM</span>(r.active_customers) <span class="tok-kw">AS</span> total_active,
+    <span class="tok-kw">SUM</span>(s.initial_customers) <span class="tok-kw">AS</span> total_cohort_base,
+    <span class="tok-kw">ROUND</span>(<span class="tok-kw">SUM</span>(r.active_customers) * <span class="tok-num">100.0</span> / <span class="tok-kw">SUM</span>(s.initial_customers), <span class="tok-num">2</span>) <span class="tok-kw">AS</span> avg_retention_pct
+<span class="tok-kw">FROM</span> retention_counts r
+<span class="tok-kw">JOIN</span> cohort_sizes s <span class="tok-kw">ON</span> r.cohort_month = s.cohort_month
+<span class="tok-kw">WHERE</span> r.month_index &lt;= <span class="tok-num">12</span>
+<span class="tok-kw">GROUP BY</span> r.month_index
+<span class="tok-kw">ORDER BY</span> r.month_index;</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>month_index</th>
+            <th>total_active</th>
+            <th>total_cohort_base</th>
+            <th>avg_retention_pct</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>0</td>
+            <td>768</td>
+            <td>768</td>
+            <td>100.0</td>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>57</td>
+            <td>623</td>
+            <td>9.15</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>53</td>
+            <td>634</td>
+            <td>8.36</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>61</td>
+            <td>633</td>
+            <td>9.64</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>50</td>
+            <td>614</td>
+            <td>8.14</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>56</td>
+            <td>523</td>
+            <td>10.71</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>67</td>
+            <td>649</td>
+            <td>10.32</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>60</td>
+            <td>690</td>
+            <td>8.7</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>47</td>
+            <td>566</td>
+            <td>8.3</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>62</td>
+            <td>658</td>
+            <td>9.42</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>47</td>
+            <td>559</td>
+            <td>8.41</td>
+        </tr>
+        <tr>
+            <td>11</td>
+            <td>80</td>
+            <td>635</td>
+            <td>12.6</td>
+        </tr>
+        <tr>
+            <td>12</td>
+            <td>67</td>
+            <td>644</td>
+            <td>10.4</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><blockquote class="nb-callout"><p>💡 <strong>Key Business Insights (Cohort Retention):</strong></p>
+<ul><li><strong>Methodology note:</strong> Cohorts are defined on completed orders only. Without the status filter, a cancelled order can define a customer&#x27;s cohort month and later cancelled orders count as retention — inflating the curve. Filtering reduces the cohort base from 787 to 768 customers (19 customers placed only cancelled or returned orders).</li><li><strong>Retention is flat, not decaying:</strong> Pooled across all cohorts, retention holds between 8.1% and 12.6% from Month 1 through Month 12, with no downward trend (M1: 9.15%, M6: 10.32%, M12: 10.40%).</li><li><strong>This shape is not realistic:</strong> Genuine e-commerce retention curves fall sharply in Month 1 and then flatten. A flat curve implies a customer&#x27;s purchase probability in Month 12 equals their probability in Month 1 — tenure carries no information. This is the signature of independent random draws, which is consistent with the dataset being synthetically generated.</li><li><strong>Analytical conclusion:</strong> Because the generating process contains no retention dynamics, this dataset cannot support conclusions about churn drivers, cohort quality, or lifecycle interventions. The ~10% monthly repeat rate is a property of the simulation, not a business finding.</li><li><strong>What this would mean on real data:</strong> A flat curve at 10% would still indicate a business with no loyalty mechanics — customers returning at a constant background rate rather than developing habit. The intervention would be lifecycle triggers (post-purchase sequences, replenishment prompts) designed to create tenure-dependent behavior where none currently exists.</li></ul></blockquote></div>
+      <div class="nb-md"><hr>
+<h3>⚠️ Limitations &amp; Scope</h3>
+<p><strong>Data provenance.</strong> Synthetic dataset (ngulikdata). Two findings are artifacts of the generating process rather than business signal:</p>
+<ul><li><em>Category distribution</em> — all six categories fall within 14% of each other in revenue. Real apparel catalogs are far more concentrated.</li><li><em>Retention curve</em> — flat at ~10% from Month 1 to Month 12 with no decay, indicating independent random purchase draws rather than customer lifecycle behavior.</li></ul>
+<p><strong>What the data cannot support:</strong></p>
+<ul><li><em>True promo ROI</em> — no cost of goods or margin data, so only revenue impact is measurable, not profitability. The promo comparison is observational; establishing incrementality requires a holdout test.</li><li><em>Courier conclusions at partner level</em> — Anteraja (307 orders) and Pos Indonesia (161) carry too little volume for confident rate comparison. No significance testing was performed.</li><li><em>Churn and lifecycle analysis</em> — see retention curve above.</li><li><em>Customer-level financial accuracy</em> — 3 duplicate email addresses were identified and deliberately not merged (see Notebook 01, Task 2).</li></ul>
+<p><strong>Definitional choices that shape results:</strong></p>
+<ul><li>Net revenue excludes cancelled and returned orders, and excludes shipping as a pass-through cost. Reconciles exactly to <code>orders.total_amount_idr</code> (1,265,340,379 IDR).</li><li>Category-level revenue is gross (1,296,768,000 IDR), because order-level discounts cannot be attributed to individual line items.</li><li>RFM segment boundaries are fixed business rules, not statistical clusters. The &quot;Lost&quot; threshold (120 days) sits below median recency (145 days), which mechanically places the majority of customers in that segment.</li></ul>
+<p><strong>Scope.</strong> Jan 2022 – Feb 2025. February 2025 may be a partial month; the apparent revenue spike should not be read as trend.</p></div>
+      <div class="nb-md"><h3>📤 Data Export for Executive Dashboard (Phase 3)</h3>
+<p><strong>Objective:</strong> To ensure high performance in the final Business Intelligence (BI) dashboard, we are exporting the aggregated insights from our Exploratory Data Analysis. Connecting a BI tool directly to pre-calculated CSVs prevents the visualization engine from lagging when processing thousands of raw transaction rows.</p>
+<p>The following dataframes are exported for visualization:</p>
+<ol><li><strong>Geospatial Revenue:</strong> To map out top-performing cities and identify high-AOV &quot;hidden gems.&quot;</li><li><strong>Promo ROI:</strong> To visualize the negative AOV impact of the current discount strategy.</li><li><strong>Courier Evaluation:</strong> To chart the return and cancellation rates for logistics auditing.</li><li><strong>RFM Segments:</strong> To display the distribution of our customer base across active, at-risk, and churned tiers.</li></ol></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-kw">import</span> os
+os.makedirs(<span class="tok-string">&#x27;dashboard_exports&#x27;</span>, exist_ok=<span class="tok-kw">True</span>)
+<span class="tok-kw">print</span>(<span class="tok-string">&quot;Export directory ready.&quot;</span>)</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><pre class="nb-stream">Export directory ready.
+</pre></div></div></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-comment">-- 1. Exporting Geospatial Data</span>
+<span class="tok-kw">COPY</span> (
+    <span class="tok-kw">SELECT</span> 
+        shipping_province,
+        shipping_city,
+        <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> total_orders,
+        <span class="tok-kw">SUM</span>(total_amount_idr) <span class="tok-kw">AS</span> total_revenue,
+        <span class="tok-kw">CAST</span>(<span class="tok-kw">SUM</span>(total_amount_idr) / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> average_order_value
+    <span class="tok-kw">FROM</span> orders
+    <span class="tok-kw">WHERE</span> order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+    <span class="tok-kw">GROUP BY</span> shipping_province, shipping_city
+    <span class="tok-kw">ORDER BY</span> total_revenue <span class="tok-kw">DESC</span>
+) <span class="tok-kw">TO</span> <span class="tok-string">&#x27;dashboard_exports/dashboard_geospatial.csv&#x27;</span> (<span class="tok-kw">HEADER</span>, <span class="tok-kw">DELIMITER</span> <span class="tok-string">&#x27;,&#x27;</span>);
+
+<span class="tok-comment">-- 2. Exporting Promo Impact Data</span>
+<span class="tok-kw">COPY</span> (
+    <span class="tok-kw">SELECT</span> 
+        <span class="tok-kw">CASE</span> 
+            <span class="tok-kw">WHEN</span> promo_code <span class="tok-kw">IS</span> <span class="tok-kw">NULL</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;No Promo&#x27;</span> 
+            <span class="tok-kw">ELSE</span> <span class="tok-string">&#x27;Used Promo&#x27;</span> 
+        <span class="tok-kw">END</span> <span class="tok-kw">AS</span> promo_status,
+        <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> total_orders,
+        <span class="tok-kw">SUM</span>(total_amount_idr) <span class="tok-kw">AS</span> net_revenue,
+        <span class="tok-kw">SUM</span>(<span class="tok-kw">COALESCE</span>(discount_amount_idr, <span class="tok-num">0</span>)) <span class="tok-kw">AS</span> total_discount_given,
+        <span class="tok-kw">CAST</span>(<span class="tok-kw">SUM</span>(total_amount_idr + <span class="tok-kw">COALESCE</span>(discount_amount_idr, <span class="tok-num">0</span>)) 
+             / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> gross_aov,
+        <span class="tok-kw">CAST</span>(<span class="tok-kw">SUM</span>(total_amount_idr) / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> net_aov
+    <span class="tok-kw">FROM</span> orders
+    <span class="tok-kw">WHERE</span> order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+    <span class="tok-kw">GROUP BY</span> promo_status
+) <span class="tok-kw">TO</span> <span class="tok-string">&#x27;dashboard_exports/dashboard_promo_roi.csv&#x27;</span> (<span class="tok-kw">HEADER</span>, <span class="tok-kw">DELIMITER</span> <span class="tok-string">&#x27;,&#x27;</span>);
+
+<span class="tok-comment">-- 3. Exporting Courier Evaluation Data</span>
+<span class="tok-kw">COPY</span> (
+    <span class="tok-kw">SELECT</span> 
+        courier,
+        <span class="tok-kw">COUNT</span>(order_id) <span class="tok-kw">AS</span> total_orders,
+        <span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;returned&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) <span class="tok-kw">AS</span> returned_orders,
+        <span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;cancelled&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) <span class="tok-kw">AS</span> cancelled_orders,
+        <span class="tok-kw">ROUND</span>(<span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;returned&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1.0</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) / <span class="tok-kw">COUNT</span>(order_id) * <span class="tok-num">100</span>, <span class="tok-num">2</span>) <span class="tok-kw">AS</span> return_rate_pct,
+        <span class="tok-kw">ROUND</span>(<span class="tok-kw">SUM</span>(<span class="tok-kw">CASE</span> <span class="tok-kw">WHEN</span> order_status = <span class="tok-string">&#x27;cancelled&#x27;</span> <span class="tok-kw">THEN</span> <span class="tok-num">1.0</span> <span class="tok-kw">ELSE</span> <span class="tok-num">0</span> <span class="tok-kw">END</span>) / <span class="tok-kw">COUNT</span>(order_id) * <span class="tok-num">100</span>, <span class="tok-num">2</span>) <span class="tok-kw">AS</span> cancel_rate_pct
+    <span class="tok-kw">FROM</span> orders
+    <span class="tok-kw">GROUP BY</span> courier
+    <span class="tok-kw">ORDER BY</span> return_rate_pct <span class="tok-kw">DESC</span>
+) <span class="tok-kw">TO</span> <span class="tok-string">&#x27;dashboard_exports/dashboard_courier_eval.csv&#x27;</span> (<span class="tok-kw">HEADER</span>, <span class="tok-kw">DELIMITER</span> <span class="tok-string">&#x27;,&#x27;</span>);
+
+<span class="tok-comment">-- 4. Exporting RFM Segmentation Data</span>
+<span class="tok-kw">COPY</span> (
+    <span class="tok-kw">WITH</span> rfm_base <span class="tok-kw">AS</span> (
+        <span class="tok-kw">SELECT</span> 
+            c.email,
+            <span class="tok-kw">CAST</span>((<span class="tok-kw">SELECT</span> <span class="tok-kw">MAX</span>(order_date) <span class="tok-kw">FROM</span> orders) <span class="tok-kw">AS</span> <span class="tok-kw">DATE</span>) - <span class="tok-kw">CAST</span>(<span class="tok-kw">MAX</span>(o.order_date) <span class="tok-kw">AS</span> <span class="tok-kw">DATE</span>) <span class="tok-kw">AS</span> recency_days,
+            <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> o.order_id) <span class="tok-kw">AS</span> frequency,
+            <span class="tok-kw">SUM</span>(o.total_amount_idr) <span class="tok-kw">AS</span> monetary_value
+        <span class="tok-kw">FROM</span> orders o
+        <span class="tok-kw">JOIN</span> customers c <span class="tok-kw">ON</span> o.customer_id = c.customer_id
+        <span class="tok-kw">GROUP BY</span> o.customer_id, c.email
+    )
+    <span class="tok-kw">SELECT</span> 
+        email,
+        recency_days,
+        frequency, 
+        monetary_value,
+        <span class="tok-kw">CASE</span> 
+            <span class="tok-kw">WHEN</span> recency_days &lt;= <span class="tok-num">60</span> <span class="tok-kw">AND</span> frequency &gt;= <span class="tok-num">5</span> <span class="tok-kw">AND</span> monetary_value &gt;= <span class="tok-num">4000000</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;🏆 Champions&#x27;</span>
+            <span class="tok-kw">WHEN</span> recency_days &gt; <span class="tok-num">60</span> <span class="tok-kw">AND</span> (frequency &gt;= <span class="tok-num">5</span> <span class="tok-kw">OR</span> monetary_value &gt;= <span class="tok-num">4000000</span>) <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;⚠️ At Risk (VIPs)&#x27;</span>
+            <span class="tok-kw">WHEN</span> recency_days &lt;= <span class="tok-num">30</span> <span class="tok-kw">AND</span> frequency &lt; <span class="tok-num">3</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;👋 New / Promising&#x27;</span>
+            <span class="tok-kw">WHEN</span> recency_days &gt;= <span class="tok-num">120</span> <span class="tok-kw">THEN</span> <span class="tok-string">&#x27;💤 Lost / Inactive&#x27;</span>
+            <span class="tok-kw">ELSE</span> <span class="tok-string">&#x27;🛒 Regulars&#x27;</span>
+        <span class="tok-kw">END</span> <span class="tok-kw">AS</span> customer_segment
+    <span class="tok-kw">FROM</span> rfm_base
+) <span class="tok-kw">TO</span> <span class="tok-string">&#x27;dashboard_exports/dashboard_rfm_segments.csv&#x27;</span> (<span class="tok-kw">HEADER</span>, <span class="tok-kw">DELIMITER</span> <span class="tok-string">&#x27;,&#x27;</span>);
+
+<span class="tok-comment">-- 5. Exporting Cohort Retention Data</span>
+<span class="tok-kw">COPY</span> (
+    <span class="tok-kw">WITH</span> first_purchases <span class="tok-kw">AS</span> (
+        <span class="tok-kw">SELECT</span> customer_id, <span class="tok-kw">DATE_TRUNC</span>(<span class="tok-string">&#x27;month&#x27;</span>, <span class="tok-kw">MIN</span>(order_date)) <span class="tok-kw">AS</span> cohort_month
+        <span class="tok-kw">FROM</span> orders
+        <span class="tok-kw">WHERE</span> order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+        <span class="tok-kw">GROUP BY</span> customer_id
+    ),
+    cohort_data <span class="tok-kw">AS</span> (
+        <span class="tok-kw">SELECT</span> f.cohort_month, <span class="tok-kw">DATE_TRUNC</span>(<span class="tok-string">&#x27;month&#x27;</span>, o.order_date) <span class="tok-kw">AS</span> activity_month, o.customer_id
+        <span class="tok-kw">FROM</span> orders o
+        <span class="tok-kw">JOIN</span> first_purchases f <span class="tok-kw">ON</span> o.customer_id = f.customer_id
+        <span class="tok-kw">WHERE</span> o.order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+    ),
+    cohort_sizes <span class="tok-kw">AS</span> (
+        <span class="tok-kw">SELECT</span> cohort_month, <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> customer_id) <span class="tok-kw">AS</span> initial_customers
+        <span class="tok-kw">FROM</span> first_purchases <span class="tok-kw">GROUP BY</span> cohort_month
+    ),
+    retention_counts <span class="tok-kw">AS</span> (
+        <span class="tok-kw">SELECT</span> c.cohort_month,
+               <span class="tok-kw">DATE_DIFF</span>(<span class="tok-string">&#x27;month&#x27;</span>, c.cohort_month, c.activity_month) <span class="tok-kw">AS</span> month_index,
+               <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> c.customer_id) <span class="tok-kw">AS</span> active_customers
+        <span class="tok-kw">FROM</span> cohort_data c
+        <span class="tok-kw">GROUP BY</span> c.cohort_month, month_index
+    )
+    <span class="tok-kw">SELECT</span> <span class="tok-kw">STRFTIME</span>(r.cohort_month, <span class="tok-string">&#x27;%Y-%m&#x27;</span>) <span class="tok-kw">AS</span> cohort_month,
+           s.initial_customers,
+           r.month_index,
+           r.active_customers,
+           <span class="tok-kw">ROUND</span>((r.active_customers * <span class="tok-num">100.0</span>) / s.initial_customers, <span class="tok-num">2</span>) <span class="tok-kw">AS</span> retention_pct
+    <span class="tok-kw">FROM</span> retention_counts r
+    <span class="tok-kw">JOIN</span> cohort_sizes s <span class="tok-kw">ON</span> r.cohort_month = s.cohort_month
+    <span class="tok-kw">ORDER BY</span> r.cohort_month <span class="tok-kw">ASC</span>, r.month_index <span class="tok-kw">ASC</span>
+) <span class="tok-kw">TO</span> <span class="tok-string">&#x27;dashboard_exports/dashboard_cohort_retention.csv&#x27;</span> (<span class="tok-kw">HEADER</span>, <span class="tok-kw">DELIMITER</span> <span class="tok-string">&#x27;,&#x27;</span>);</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>650</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-cell"><div class="nb-in"><span class="nb-gutter">In</span><pre class="nb-code"><code><span class="tok-magic">%%sql</span>
+<span class="tok-kw">COPY</span> (
+    <span class="tok-kw">WITH</span> order_gross <span class="tok-kw">AS</span> (
+        <span class="tok-comment">-- Aggregate to order level first to avoid multiplying order-level discount</span>
+        <span class="tok-kw">SELECT</span> 
+            o.order_id,
+            <span class="tok-kw">STRFTIME</span>(o.order_date, <span class="tok-string">&#x27;%Y-%m&#x27;</span>) <span class="tok-kw">AS</span> order_month,
+            <span class="tok-kw">SUM</span>(oi.quantity) <span class="tok-kw">AS</span> units,
+            <span class="tok-kw">SUM</span>(oi.subtotal_idr) <span class="tok-kw">AS</span> gross_revenue,
+            <span class="tok-kw">MAX</span>(<span class="tok-kw">COALESCE</span>(o.discount_amount_idr, <span class="tok-num">0</span>)) <span class="tok-kw">AS</span> discount
+        <span class="tok-kw">FROM</span> orders o
+        <span class="tok-kw">JOIN</span> order_items oi <span class="tok-kw">ON</span> o.order_id = oi.order_id
+        <span class="tok-kw">WHERE</span> o.order_status <span class="tok-kw">NOT</span> <span class="tok-kw">IN</span> (<span class="tok-string">&#x27;cancelled&#x27;</span>, <span class="tok-string">&#x27;returned&#x27;</span>)
+        <span class="tok-kw">GROUP BY</span> o.order_id, order_month, o.discount_amount_idr
+    )
+    <span class="tok-kw">SELECT</span> 
+        order_month,
+        <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> total_orders,
+        <span class="tok-kw">SUM</span>(units) <span class="tok-kw">AS</span> total_units_sold,
+        <span class="tok-kw">SUM</span>(gross_revenue) <span class="tok-kw">AS</span> gross_revenue,
+        <span class="tok-kw">SUM</span>(discount) <span class="tok-kw">AS</span> total_discount,
+        <span class="tok-kw">SUM</span>(gross_revenue) - <span class="tok-kw">SUM</span>(discount) <span class="tok-kw">AS</span> net_revenue,
+        <span class="tok-kw">CAST</span>((<span class="tok-kw">SUM</span>(gross_revenue) - <span class="tok-kw">SUM</span>(discount)) / <span class="tok-kw">COUNT</span>(<span class="tok-kw">DISTINCT</span> order_id) <span class="tok-kw">AS</span> <span class="tok-kw">BIGINT</span>) <span class="tok-kw">AS</span> net_aov
+    <span class="tok-kw">FROM</span> order_gross
+    <span class="tok-kw">GROUP BY</span> order_month
+    <span class="tok-kw">ORDER BY</span> order_month <span class="tok-kw">ASC</span>
+) <span class="tok-kw">TO</span> <span class="tok-string">&#x27;dashboard_exports/dashboard_monthly_revenue.csv&#x27;</span> (<span class="tok-kw">HEADER</span>, <span class="tok-kw">DELIMITER</span> <span class="tok-string">&#x27;,&#x27;</span>);</code></pre></div><div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body"><div class="nb-table-wrap"><table>
+    <thead>
+        <tr>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>38</td>
+        </tr>
+    </tbody>
+</table></div></div></div></div>
+      <div class="nb-md"><p><strong>✅ Phase 2 (Exploratory Data Analysis) Complete.</strong></p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Renaldy Bilal Setyawan · <a href="../gayanara-ecommerce.html">Gayanara case study</a> · <a href="../../index.html">All projects</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

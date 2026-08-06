@@ -1,0 +1,181 @@
+/* ==========================================================================
+   Rendered notebook pages (projects/notebooks/*.html)
+   Layered on top of style.css — reuses its tokens, adds only what the
+   notebook view needs. Generated pages are built by tools/build_notebooks.py.
+   ========================================================================== */
+
+/* ---- hero ---- */
+.nb-hero { padding: 3.5rem 0 3rem; }
+.nb-hero h1 {
+  font-size: clamp(1.5rem, 1.15rem + 1.5vw, 2.15rem);
+  margin-bottom: 0.6rem;
+}
+.nb-hero-sub {
+  color: var(--ink-soft);
+  max-width: 68ch;
+  margin-bottom: 0.75rem;
+}
+.nb-source {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-faint);
+  max-width: 68ch;
+}
+.nb-source code { color: var(--ink-soft); }
+
+/* ---- body ---- */
+.nb-body {
+  padding: 2.5rem 0 4rem;
+  background: var(--bg-alt);
+  border-top: 1px solid var(--grid-line);
+}
+.nb-body > .wrap { max-width: 900px; }
+
+/* ---- markdown cells ---- */
+.nb-md { margin: 0 0 1.5rem; max-width: 72ch; }
+.nb-md > *:last-child { margin-bottom: 0; }
+.nb-md h2 {
+  font-size: 1.35rem;
+  margin: 2.75rem 0 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--grid-line);
+}
+.nb-md h3 { font-size: 1.05rem; margin: 1.75rem 0 0.5rem; }
+.nb-md h4, .nb-md h5, .nb-md h6 { font-size: 0.95rem; margin: 1.25rem 0 0.5rem; }
+.nb-md p { color: var(--ink-soft); }
+.nb-md strong { color: var(--ink); }
+.nb-md code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg);
+  border: 1px solid var(--grid-line);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+.nb-md hr {
+  border: 0;
+  border-top: 1px solid var(--grid-line);
+  margin: 1.75rem 0;
+}
+.nb-md ul, .nb-md ol {
+  margin: 0 0 1em;
+  padding-left: 1.35rem;
+  color: var(--ink-soft);
+}
+.nb-md ul { list-style: disc; }
+.nb-md ol { list-style: decimal; }
+.nb-md li { margin-bottom: 0.4rem; }
+
+/* insight / note callouts (the notebooks' blockquotes) */
+.nb-callout {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.15rem;
+  background: var(--bg);
+  border-left: 3px solid var(--series-primary);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.925rem;
+}
+.nb-callout > *:last-child { margin-bottom: 0; }
+.nb-callout p, .nb-callout ul, .nb-callout ol { color: var(--ink-soft); }
+.nb-callout code { background: var(--bg-alt); }
+
+/* ---- code cells ---- */
+.nb-cell { margin: 0 0 1.75rem; }
+
+.nb-gutter {
+  flex: 0 0 2.4rem;
+  padding-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  user-select: none;
+}
+
+.nb-in, .nb-out { display: flex; align-items: flex-start; gap: 0.5rem; }
+.nb-in { margin-bottom: 0.5rem; }
+
+.nb-code {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 1rem 1.1rem;
+  background: var(--ink);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.nb-code code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: #E7ECF5;
+  white-space: pre;
+}
+
+/* syntax tokens — tuned against the #17213B code background */
+.tok-kw      { color: #7FD1C8; font-weight: 500; }
+.tok-string  { color: #F0B67F; }
+.tok-comment { color: #96A3BD; font-style: italic; }
+.tok-num     { color: #C9A7F0; }
+.tok-magic   { color: #7FD1C8; font-weight: 600; }
+
+/* ---- outputs ---- */
+.nb-out-body { flex: 1 1 auto; min-width: 0; }
+
+.nb-stream {
+  margin: 0 0 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--grid-line);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+.nb-error { border-color: #C6543F; color: #A33B28; }
+
+/* result tables come from JupySQL as raw <table> markup */
+.nb-table-wrap {
+  overflow: auto;
+  max-height: 26rem;
+  border: 1px solid var(--grid-line);
+  border-radius: 8px;
+  background: var(--bg-alt);
+  margin-bottom: 0.5rem;
+}
+.nb-table-wrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}
+.nb-table-wrap th, .nb-table-wrap td {
+  padding: 0.45rem 0.75rem;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--grid-line);
+}
+.nb-table-wrap th:first-child, .nb-table-wrap td:first-child { text-align: left; }
+.nb-table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-align: right;
+  border-bottom: 1px solid var(--grid-line);
+}
+.nb-table-wrap thead th:first-child { text-align: left; }
+.nb-table-wrap tbody tr:last-child td { border-bottom: none; }
+.nb-table-wrap tbody tr:hover { background: var(--bg); }
+.nb-table-wrap td { color: var(--ink-soft); }
+
+@media (max-width: 640px) {
+  .nb-gutter { display: none; }
+  .nb-in, .nb-out { gap: 0; }
+}
