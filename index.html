@@ -3,589 +3,718 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Renaldy Bilal Setyawan — Data Analyst | Surabaya, Indonesia</title>
-<meta name="description" content="Renaldy Bilal Setyawan is a Data Analyst based in Surabaya, Indonesia, with a 5+ year backend engineering foundation. SQL, Python, and Tableau work backed by verified credentials and quantified results.">
-<meta name="keywords" content="Data Analyst, SQL, Python, Tableau, Data Visualization, Business Intelligence, Data Analytics, Surabaya, Indonesia, Renaldy Bilal Setyawan">
+<title>Renaldy Bilal Setyawan — Software Engineer · Data, Frontend, Backend, Fullstack</title>
+<meta name="description" content="Renaldy Bilal Setyawan is a software engineer in Surabaya, Indonesia, working across data analytics, frontend, backend and fullstack — 6+ years of engineering, backed by verified credentials and quantified results.">
+<meta name="keywords" content="Software Engineer, Data Analyst, Backend Developer, Frontend Developer, Fullstack Developer, SQL, Python, Tableau, Go, Laravel, Next.js, Surabaya, Indonesia, Renaldy Bilal Setyawan">
 <meta name="author" content="Renaldy Bilal Setyawan">
-
 <meta property="og:type" content="website">
-<meta property="og:title" content="Renaldy Bilal Setyawan — Data Analyst | Surabaya, Indonesia">
-<meta property="og:description" content="Data Analyst with a 5+ year backend engineering foundation. SQL, Python, and Tableau work backed by verified credentials and quantified results.">
+<meta property="og:title" content="Renaldy Bilal Setyawan — Software Engineer">
+<meta property="og:description" content="Data, frontend, backend and fullstack — 6+ years of engineering, verified credentials and quantified results.">
 <meta property="og:url" content="https://renalazy.github.io/portofren/">
 <meta property="og:image" content="assets/img/displaypic.png">
-
+<meta name="theme-color" content="#FCE3CF">
 <link rel="icon" type="image/png" href="assets/img/r.png">
 <link rel="apple-touch-icon" href="assets/img/r.png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/theme.css?v=6">
+<style>
+/* ---------- hero ---------- */
+.hero{grid-column:span 8;display:flex}
+.npc{flex:1;display:flex;flex-direction:column}
+.npc .win-b{padding:30px 32px 26px;display:flex;flex-direction:column;flex:1}
+.npc-name{font:700 16px/1 var(--font-body);color:var(--npc);margin-bottom:14px}
+.npc h1{font:800 clamp(32px,4.4vw,54px)/1.08 var(--fantasy);letter-spacing:.005em}
+.hero-links{display:flex;flex-wrap:wrap;gap:18px;margin-top:20px;font-weight:600;font-size:15px}
+.hero-links a{display:inline-flex;align-items:center;gap:8px;color:var(--ink-soft);text-decoration:none}
+.hero-links a:hover{color:var(--accent)}
+.npc-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:auto;padding-top:18px;border-top:1px dashed var(--frame-soft)}
+.npc-foot .px{color:var(--ink-faint);line-height:1.4}
+.caret{display:inline-block;animation:bob 1.2s ease-in-out infinite;color:var(--accent)}
+@keyframes bob{50%{transform:translateY(3px)}}
 
-<link rel="stylesheet" href="assets/css/style.css?v=2">
+/* status window */
+.status{grid-column:span 4;display:flex;flex-direction:column;overflow:visible}
+.status .win-t{border-radius:13px 13px 0 0}
+.status .win-b{display:flex;flex-direction:column;gap:16px;flex:1}
+.who{display:flex;gap:14px;align-items:center}
+.portrait{width:70px;height:70px;border-radius:12px;padding:3px;background:linear-gradient(135deg,var(--gold-line),#fff,var(--frame));flex:none}
+.portrait img{width:100%;height:100%;object-fit:cover;border-radius:9px}
+.who b{font:700 17px/1.25 var(--font-body);display:block}
+.who .px{color:var(--npc);margin-top:6px;display:block}
+.lvls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lvls div{border:1px solid var(--frame-soft);background:var(--win-2);border-radius:8px;padding:8px 10px}
+.lvls span{display:block;font:500 11px/1 var(--pixel);color:var(--ink-faint)}
+.lvls b{font:700 20px/1.3 var(--font-body);color:var(--title-ink)}
+.gauge{display:grid;gap:8px}
+.gl{display:flex;justify-content:space-between;gap:8px;font:500 12px/1.2 var(--font-body);color:var(--ink-soft);margin-bottom:4px}
+.meter{height:11px;border-radius:6px;border:1px solid #CDB58A;background:#F6EEDF;overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 70%,#fff),var(--c))}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font:500 13px/1.2 var(--font-body)}
+.stats em{font:500 12px/1.2 var(--pixel)}
+.stats div{display:flex;justify-content:space-between;gap:6px;padding:6px 0;border-bottom:1px dotted var(--frame-soft)}
+.stats b{color:var(--title-ink);text-align:right;font-weight:700}
+.stats em{font-style:normal;color:var(--ink-faint)}
+.status .row{margin-top:auto}
+.status .row > *{flex:1}
+.status .dd-menu{left:auto;right:0}
+
+/* records strip */
+.records{margin-top:18px}
+.rec{display:grid;grid-template-columns:repeat(5,1fr)}
+.rec div{padding:18px 18px 16px;border-left:1px dotted var(--frame-soft)}
+.rec div:first-child{border-left:0}
+.rec p{margin:6px 0 0;font-size:14px;line-height:20px;color:var(--ink-soft)}
+
+/* story (about) */
+.story .win-b{display:grid;grid-template-columns:300px 1fr;gap:36px;padding:30px}
+.story img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:3px solid #fff;box-shadow:0 0 0 1px var(--frame)}
+.story dl{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 0}
+.story dl div{border:1px solid var(--frame-soft);background:var(--win-2);border-radius:8px;padding:8px 10px}
+.story dt{font:500 11px/1.2 var(--pixel);color:var(--ink-faint)}
+.story dd{margin:3px 0 0;font-weight:600;font-size:14px;line-height:19px}
+.story h2{margin-bottom:14px;font-size:clamp(24px,3vw,32px)}
+.story p{color:var(--ink-soft);margin:0 0 14px}
+.impact{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:10px}
+.impact li{display:flex;gap:12px;color:var(--ink-soft)}
+.impact li::before{content:"";width:9px;height:9px;transform:rotate(45deg);background:var(--gold-line);border:1px solid var(--gold);margin-top:8px;flex:none}
+
+/* job filter */
+.jobs{margin-bottom:22px}
+.jobs .win-b{padding:16px}
+.job{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.job button{all:unset;cursor:pointer;text-align:center;padding:12px 6px 10px;border:1px solid var(--frame-soft);border-radius:12px;background:var(--win-2);transition:transform .15s}
+.job button:hover{transform:translateY(-2px)}
+.job .emb{width:40px;height:40px;margin:0 auto 8px;border-radius:50%;display:grid;place-items:center;background:var(--f,#fff);color:var(--i,var(--title-ink));border:2px solid color-mix(in srgb,var(--i,var(--title-ink)) 35%,#fff);font:800 16px/1 var(--fantasy)}
+.job b{display:block;font:700 14px/1.2 var(--font-body)}
+.job small{display:block;font:500 11px/1.3 var(--pixel);color:var(--ink-faint);margin-top:3px}
+.job button[aria-pressed=true]{background:#fff;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,65,12,.15)}
+.job button:focus-visible{outline:3px solid var(--accent)}
+
+/* quests = equal item windows, engineering and data share one layout */
+.qgrid{display:flex;flex-wrap:wrap;gap:18px;justify-content:center}
+.q{flex:0 1 calc((100% - 36px)/3);min-width:0;display:flex!important;flex-direction:column}
+.q-eng{--r:var(--backend-ink);--rt:var(--backend-fill)}
+.q-data{--r:var(--data-ink);--rt:var(--data-fill)}
+.q-own{--r:var(--accent);--rt:#FFE3D2}
+.q-comm{--r:var(--epic);--rt:#EDE2F7}
+.kinds{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+.kinds .px,.jl{color:var(--ink-faint);margin-right:6px;display:inline-block}
+.jl{margin-bottom:8px}
+.kinds button{font:700 13px/1 var(--font-body);color:var(--title-ink);cursor:pointer;padding:9px 12px;border-radius:9px;border:1px solid var(--frame);background:linear-gradient(#FFFDF7,#F6E8CC)}
+.kinds button[aria-pressed=true]{background:var(--accent);border-color:#A2380B;color:#fff}
+.q .win-t{background:linear-gradient(180deg,#fff,var(--rt))}
+.q .win-t .rar{color:var(--r)}
+.q .win-b{display:flex;flex-direction:column;flex:1;min-width:0}
+.q:hover{border-color:var(--r)!important}
+.slots{display:flex;gap:4px;align-items:center}
+.slots i{width:10px;height:10px;transform:rotate(45deg);border:1.5px solid var(--r);background:#fff}
+.slots i.on{background:var(--r)}
+.q h3,.q p{overflow-wrap:anywhere}
+.q p{color:var(--ink-soft);margin:6px 0 14px}
+.tools{font:500 12px/1.4 var(--pixel);color:var(--ink-faint);margin-bottom:12px}
+.note{font-size:13px;line-height:19px;color:var(--ink-faint);margin:12px 0 0}
+.reward{margin-top:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 12px;border-radius:10px;background:var(--gold-soft);border:1px solid var(--gold-line);font-size:14px}
+.reward .px{color:var(--gold)}
+.reward b{font:700 14px/1.3 var(--font-body);color:var(--ink)}
+.go{margin-top:12px;font-weight:700;color:var(--accent)}
+/* drawn system flow standing in for a screenshot */
+.flowviz{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px;
+  background:repeating-linear-gradient(0deg,transparent 0 19px,rgba(210,185,140,.25) 19px 20px),repeating-linear-gradient(90deg,transparent 0 19px,rgba(210,185,140,.25) 19px 20px),var(--win-2)}
+.flowviz .node{max-width:100%;text-align:center;font:600 13px/1.25 var(--font-mono);color:var(--ink);background:#fff;border:1px solid var(--frame);border-radius:8px;padding:7px 12px;box-shadow:0 2px 0 var(--frame-soft);overflow-wrap:anywhere}
+.flowviz .node.hot{background:var(--backend-fill);border-color:#C9A64A;color:var(--backend-ink)}
+.flowviz i{font-style:normal;color:var(--gold);font-weight:700;line-height:1}
+.work{transition:opacity .25s,transform .2s,box-shadow .2s}.work.dim{opacity:.3}
+/* skills */
+.skills{grid-column:span 3}
+.skills .win-t{background:linear-gradient(180deg,#fff,var(--f))}
+.sk{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dotted var(--frame-soft)}
+.sk:last-child{border:0}
+.sk .ico{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;background:var(--f);color:var(--i);font:700 11px/1 var(--pixel);flex:none;border:1px solid color-mix(in srgb,var(--i) 25%,#fff)}
+.sk span{font-weight:600;font-size:15px;line-height:19px}
+.sk span small{display:block;font:500 11px/1.2 var(--pixel);color:var(--ink-faint)}
+.sk .px{margin-left:auto;color:var(--i);white-space:nowrap;font:700 13px/1 var(--font-body)}
+
+/* achievements */
+.r-leg{--r:var(--legendary)}.r-epic{--r:var(--epic)}.r-rare{--r:var(--rare)}.r-common{--r:var(--common)}
+.ach{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.badge{position:relative;display:flex;gap:14px;align-items:center;padding:14px 16px;background:var(--win);border:1px solid var(--frame-soft);border-radius:12px;box-shadow:0 6px 18px -14px rgba(110,70,20,.5)}
+.gem{width:46px;height:46px;flex:none;display:grid;place-items:center;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(160deg,color-mix(in srgb,var(--r) 55%,#fff),var(--r));color:#fff;font:700 12px/1 var(--font-body);text-align:center}
+.badge b{display:block;font-weight:600;font-size:15px;line-height:20px}
+.badge small{display:block;font-size:13px;color:var(--ink-faint)}
+.badge a{font-size:13px;font-weight:700;text-decoration:none}
+.tip{position:absolute;left:12px;right:12px;bottom:calc(100% + 8px);z-index:5;background:#fff;color:var(--ink);border:1px solid var(--frame);border-radius:10px;font-size:13px;line-height:18px;opacity:0;transform:translateY(4px);pointer-events:none;transition:.15s;box-shadow:var(--shadow-lift);overflow:hidden}
+.tip .px{display:block;padding:7px 10px;background:linear-gradient(var(--title-1),var(--title-2));color:var(--r);border-bottom:1px solid var(--frame-soft)}
+.tip span{display:block;padding:8px 10px}
+.badge:hover .tip,.badge:focus-within .tip{opacity:1;transform:none}
+.supp{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.chip{font:500 12px/1 var(--pixel);padding:7px 10px;border-radius:8px;background:var(--win);border:1px solid var(--frame-soft);color:var(--ink-soft)}
+
+/* quest log */
+.log{display:grid;gap:14px}
+.entry .win-b{display:grid;grid-template-columns:220px 1fr;gap:28px;padding:26px}
+.when{font:700 14px/1.3 var(--font-body);letter-spacing:.02em;color:var(--gold)}
+.tag{display:inline-block;margin-top:10px;font:700 11px/1 var(--pixel);padding:5px 8px;border-radius:6px;background:#E3F4E8;color:#1F6B35;border:1px solid #A9D9B6}
+.tag.done{background:var(--win-2);color:var(--ink-faint);border-color:var(--frame-soft)}
+.entry .row{margin-top:12px}
+.entry h3 small{display:block;font:500 15px/1.4 var(--font-body);color:var(--ink-faint);margin-top:4px;letter-spacing:0}
+.entry p{color:var(--ink-soft);margin:12px 0 0}
+.entry ul{margin:12px 0 0;padding-left:20px;color:var(--ink-soft);display:grid;gap:9px}
+.entry ul b{color:var(--ink)}
+details.side summary{cursor:pointer;list-style:none;text-transform:none;letter-spacing:.02em}
+details.side summary::-webkit-details-marker{display:none}
+details.side summary::after{content:"+";font:700 18px/1 var(--font-body)}
+details.side[open] summary::after{content:"–"}
+
+/* open requests inside the invite */
+.quests{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 24px;text-align:left}
+.req{border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:12px;padding:14px 16px}
+.req .px{color:var(--gold);display:block;margin-bottom:8px}
+.req b{display:block;font-weight:700;font-size:16px}
+.req small{display:block;color:var(--ink-soft);font-size:14px;line-height:20px;margin-top:2px}
+/* training + contact */
+.ec{display:grid;grid-template-columns:1fr 1.2fr;gap:18px;align-items:start}
+.edu{padding-top:16px;margin-top:16px;border-top:1px dotted var(--frame-soft)}
+.edu:first-child{border:0;padding:0;margin:0}
+.edu p{margin:4px 0 0;color:var(--ink-soft)}
+.contact-list{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:10px}
+.contact-list a{display:flex;align-items:center;gap:12px;color:var(--ink);text-decoration:none;font-weight:600;word-break:break-word}
+.contact-list a:hover{color:var(--accent)}
+form{display:grid;gap:12px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font:500 12px/1 var(--pixel);color:var(--title-ink);margin-bottom:6px}
+input,textarea{width:100%;font:400 16px/1.4 var(--font-body);color:var(--ink);background:#fff;border:1px solid var(--frame);border-radius:8px;padding:11px 13px;box-shadow:0 1px 2px rgba(110,70,20,.08) inset}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.form-note{font-size:13px;color:var(--ink-faint);margin:0}
+
+/* party invite + chat */
+.invite{max-width:760px;margin:0 auto;text-align:center}
+.invite .win-b{padding:34px 28px}
+.invite h2{font-size:clamp(26px,4vw,36px)}
+.invite p{color:var(--ink-soft);margin:12px auto 24px;max-width:460px}
+.invite .row{justify-content:center}
+.chat{margin:40px auto 0;max-width:640px;background:rgba(255,255,255,.72);border:1px solid var(--frame-soft);border-radius:10px;padding:10px 14px;font:500 13px/1.7 var(--pixel);color:var(--ink-soft);word-break:break-word}
+.chat b{color:var(--npc)}.chat .sys{color:#1F6B35}
+
+@media (max-width:1100px){.skills{grid-column:span 6}.q{flex-basis:calc((100% - 18px)/2)}}
+@media (max-width:1000px){.rec{grid-template-columns:repeat(3,1fr)}.rec div:nth-child(4){border-left:0}.rec div:nth-child(n+4){border-top:1px dotted var(--frame-soft)}}
+@media (max-width:860px){
+  .npc .win-b{padding:22px}
+  .rec{grid-template-columns:1fr 1fr}.rec div{border-left:0!important;border-top:1px dotted var(--frame-soft)!important}.rec div:nth-child(-n+2){border-top:0!important}.rec div:nth-child(even){border-left:1px dotted var(--frame-soft)!important}
+  .rec div:last-child{grid-column:span 2}
+  .story .win-b{grid-template-columns:1fr;padding:20px;gap:22px}.story img{max-width:240px}
+  .job{grid-template-columns:repeat(3,1fr)}
+  .entry .win-b{grid-template-columns:1fr;gap:10px;padding:20px}
+  .quests{grid-template-columns:1fr}
+  .ec{grid-template-columns:1fr}
+}
+@media (max-width:700px){.q{flex-basis:100%}}
+@media (max-width:480px){.job{grid-template-columns:repeat(2,1fr)}.job button:first-child{grid-column:span 2}.form-row{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
-<svg class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
-  <symbol id="icon-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-    <polyline points="2 6 12 13 22 6"></polyline>
-  </symbol>
-  <symbol id="icon-github" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.775.418-1.305.762-1.605-2.665-.305-5.467-1.334-5.467-5.93 0-1.31.467-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.405c1.02.005 2.045.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
-  </symbol>
-  <symbol id="icon-linkedin" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
-  </symbol>
-  <symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="10"></circle>
-    <line x1="2" y1="12" x2="22" y2="12"></line>
-    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-  </symbol>
-  <symbol id="icon-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-    <circle cx="12" cy="10" r="3"></circle>
-  </symbol>
-  <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-    <polyline points="7 10 12 15 17 10"></polyline>
-    <line x1="12" y1="15" x2="12" y2="3"></line>
-  </symbol>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></symbol>
+  <symbol id="i-gh" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></symbol>
+  <symbol id="i-in" viewBox="0 0 24 24" fill="currentColor"><path d="M20.4 20.5h-3.5v-5.6c0-1.3 0-3-1.9-3s-2.1 1.4-2.1 2.9v5.7H9.4V9h3.4v1.6c.5-.9 1.6-1.9 3.4-1.9 3.6 0 4.3 2.4 4.3 5.5v6.3zM5.3 7.4a2.1 2.1 0 1 1 0-4.1 2.1 2.1 0 0 1 0 4.1zm1.8 13.1H3.6V9h3.5v11.5zM22.2 0H1.8C.8 0 0 .8 0 1.7v20.6c0 .9.8 1.7 1.8 1.7h20.4c1 0 1.8-.8 1.8-1.7V1.7C24 .8 23.2 0 22.2 0z"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
 </svg>
 
-<header class="site-header">
-  <nav class="nav" aria-label="Primary">
-    <a class="brand" href="#home" aria-label="Renaldy Bilal Setyawan — home">
-      <img src="assets/img/r.png" alt="" width="26" height="26">
-      <span aria-hidden="true">RBS</span>
-    </a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Toggle navigation menu">
-      <span class="nav-toggle-bars"></span>
-    </button>
-    <ul class="nav-links" id="nav-links">
-      <li><a class="nav-link" href="#home" aria-current="true">Home</a></li>
-      <li><a class="nav-link" href="#about">About</a></li>
-      <li><a class="nav-link" href="#skills">Skills</a></li>
-      <li><a class="nav-link" href="#credentials">Credentials</a></li>
-      <li><a class="nav-link" href="#projects">Projects</a></li>
-      <li><a class="nav-link" href="#experience">Experience</a></li>
-      <li><a class="nav-link" href="#education">Education</a></li>
-      <li><a class="nav-link" href="#contact">Contact</a></li>
-    </ul>
+<header class="nav" data-nav><div class="wrap">
+  <a class="logo" href="#main" aria-label="Renaldy — home">Renaldy<span>.</span></a>
+  <nav class="nav-links" aria-label="Main">
+    <a href="#quests" data-i18n="nav.work">Quests</a><a href="#story" data-i18n="nav.about">Story</a><a href="#skills" data-i18n="nav.skills">Skills</a><a href="#achievements" data-i18n="nav.creds">Achievements</a><a href="#log" data-i18n="nav.exp">Quest log</a><a href="#contact" data-i18n="nav.contact">Contact</a>
   </nav>
-</header>
+  <div class="nav-tools">
+    <div class="seg" id="lang" role="group" aria-label="Language"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="id" aria-pressed="false">ID</button></div>
+    <button class="icon-btn menu-btn" id="menu" type="button" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+</div></header>
+<nav class="mobile-menu" id="mobile-menu" aria-label="Mobile">
+  <a href="#quests" data-i18n="nav.work">Quests</a><a href="#story" data-i18n="nav.about">Story</a><a href="#skills" data-i18n="nav.skills">Skills</a><a href="#achievements" data-i18n="nav.creds">Achievements</a><a href="#log" data-i18n="nav.exp">Quest log</a><a href="#contact" data-i18n="nav.contact">Contact</a>
+</nav>
 
-<main id="main">
+<main id="main" class="wrap" style="padding-top:26px">
 
-  <!-- ============================= HERO ============================= -->
-  <section id="home" class="hero graph-paper">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow">Data Analyst</span>
-        <h1>Renaldy Bilal Setyawan</h1>
-        <p class="hero-tagline">Transforming complex backend databases and pipelines into clear, actionable business insights.</p>
-        <div class="hero-meta">
-          <span class="location">Surabaya, East Java, Indonesia</span>
-        </div>
-        <div class="hero-links">
-          <a href="mailto:renaldybys@gmail.com"><svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg>Email</a>
-          <a href="https://github.com/renalazy" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#icon-github"></use></svg>GitHub</a>
-          <a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#icon-linkedin"></use></svg>LinkedIn</a>
-          <a href="https://renalazy.github.io/portofren/" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#icon-globe"></use></svg>Portfolio</a>
-        </div>
-        <div class="hero-cta">
-          <a class="btn btn-secondary" href="pdf/CV_ATS_RENALDY_DA%20(Intern).pdf" target="_blank" rel="noopener" title="ATS-friendly Data Analyst CV (PDF)"><svg class="icon" aria-hidden="true"><use href="#icon-download"></use></svg>Download CV</a>
-          <a class="btn btn-primary" href="#contact">Get in touch</a>
-          <span class="btn-note">Data Analyst CV — ATS-friendly PDF</span>
-        </div>
-      </div>
-
-      <div class="hero-kpi" aria-label="Verified impact metrics">
-        <div class="kpi-strip">
-          <div class="kpi-tile">
-            <span class="kpi-value">40%</span>
-            <span class="kpi-label">faster query response (SQL tuning, PostgreSQL, 5,000+ users)</span>
+  <!-- HERO: NPC dialogue + status window -->
+  <div class="grid">
+    <div class="hero">
+      <div class="win npc">
+        <div class="win-t"><span data-i18n="w.welcome">Welcome, traveler</span><span class="dots"><i>–</i><i>×</i></span></div>
+        <div class="win-b">
+          <div class="npc-name">[Renaldy]</div>
+          <h1 data-i18n="hero.h1">Hi, I'm Renaldy.<br>Ready to join <span class="hl">your party</span>.</h1>
+          <p class="lead" data-i18n="hero.lead">Six years of clearing quests across the whole stack — backend systems, interfaces, dashboards and data. I bring steady hands, clear communication and work that ships.</p>
+          <div class="hero-links">
+            <a href="mailto:renaldybys@gmail.com"><svg class="icon"><use href="#i-mail"/></svg>Email</a>
+            <a href="https://github.com/renalazy" target="_blank" rel="noopener"><svg class="icon"><use href="#i-gh"/></svg>GitHub</a>
+            <a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener"><svg class="icon"><use href="#i-in"/></svg>LinkedIn</a>
+            <a href="https://www.instagram.com/renxietyyyy/" target="_blank" rel="noopener"><svg class="icon"><use href="#i-ig"/></svg>Instagram</a>
           </div>
-          <div class="kpi-tile">
-            <span class="kpi-value">90%</span>
-            <span class="kpi-label">less manual data entry (automated PDDIKTI integration)</span>
-          </div>
-          <div class="kpi-tile">
-            <span class="kpi-value">20+</span>
-            <span class="kpi-label">relational tables modeled (OBE curriculum)</span>
-          </div>
-          <div class="kpi-tile">
-            <span class="kpi-value">90.91</span>
-            <span class="kpi-label">RevoU Full-stack Data Analytics grade</span>
-          </div>
-          <div class="kpi-tile">
-            <span class="kpi-value">5,000+</span>
-            <span class="kpi-label">active institutional users served</span>
+          <div class="npc-foot" style="margin-top:26px">
+            <span class="px" data-i18n="hero.meta">Software engineer · Surabaya, East Java, Indonesia</span>
+            <a class="btn" href="#quests"><span class="l"><span data-i18n="hero.next">See my work</span> <span class="caret">▾</span></span></a>
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ============================= ABOUT ============================= -->
-  <section id="about" class="alt">
-    <div class="wrap about-grid">
-      <div class="about-media">
-        <img class="about-photo" src="assets/img/displaypic.png" alt="Portrait of Renaldy Bilal Setyawan">
-        <dl class="facts-panel">
-          <div><dt>Experience</dt><dd>5+ years</dd></div>
-          <div><dt>Location</dt><dd>Surabaya, ID</dd></div>
-          <div><dt>Focus</dt><dd>Data Analytics (SQL, Python, Tableau)</dd></div>
-          <div><dt>Foundation</dt><dd>Backend engineering (Go, PHP)</dd></div>
-        </dl>
+    <aside class="win status" aria-label="Basic info — at a glance">
+      <div class="win-t"><span data-i18n="w.info">Basic info</span><span class="dots"><i>–</i><i>×</i></span></div>
+      <div class="win-b">
+        <div class="who">
+          <div class="portrait"><img src="assets/img/displaypic.png" alt="Portrait of Renaldy Bilal Setyawan"></div>
+          <div><b>Renaldy Bilal Setyawan</b><span class="px">Software Engineer</span></div>
+        </div>
+        <div class="lvls"><div><span data-i18n="lv.base">BASE LV · YEARS</span><b>6+</b></div><div><span data-i18n="lv.job">JOB LV · TRACKS</span><b>4</b></div></div>
+        <div class="gauge">
+          <div><div class="gl"><span data-i18n="hp">HP · availability</span><span data-i18n="hpv">Open to work</span></div><div class="meter"><i style="--c:var(--hp);width:100%"></i></div></div>
+          <div><div class="gl"><span data-i18n="sp">SP · focus</span><span data-i18n="spv">Data &amp; web</span></div><div class="meter"><i style="--c:var(--sp);width:86%"></i></div></div>
+          <div><div class="gl"><span>EXP</span><span>82.4%</span></div><div class="meter"><i style="--c:var(--exp);width:82%"></i></div></div>
+        </div>
+        <div class="stats">
+          <div><em>STR</em><b>Backend 85</b></div><div><em>INT</em><b>Data 90</b></div>
+          <div><em>DEX</em><b>Frontend 65</b></div><div><em>AGI</em><b data-i18n="agi">−25% time</b></div>
+          <div><em>MAP</em><b>Surabaya</b></div><div><em>MODE</em><b data-i18n="mode">Remote / hybrid</b></div>
+        </div>
+        <div class="row">
+          <div class="dd">
+            <button class="btn btn--primary" type="button" data-dd aria-expanded="false"><span data-i18n="cta.cv">Download CV</span><small data-i18n="cta.cvs">VIEW EQUIPMENT</small></button>
+            <div class="dd-menu">
+              <a href="pdf/CV_ATS_RENALDY_DA%20(Intern).pdf" target="_blank" rel="noopener">Data Analyst CV<small data-i18n="cv.ats">ATS-friendly PDF</small></a>
+              <a href="pdf/CV_ATS_RENALDY_Backend.pdf" target="_blank" rel="noopener">Backend Developer CV<small data-i18n="cv.ats">ATS-friendly PDF</small></a>
+            </div>
+          </div>
+          <a class="btn" href="#contact"><span data-i18n="cta.touch">Get in touch</span><small data-i18n="cta.touchs">SEND WHISPER</small></a>
+        </div>
       </div>
-      <div class="about-copy">
-        <span class="eyebrow">About</span>
-        <h2>Bridging engineering rigor and analytics clarity</h2>
-        <div class="bio">
-          <p>Data-driven Analyst with a 5+ year foundation in backend and full-stack engineering. I help organizations optimize their data systems, build clean reporting pipelines, and turn complex data schemas into clear, actionable business insights. By bridging the gap between rigorous software engineering and modern data analytics (Python, SQL, Tableau), I ensure data is not just analyzed, but retrieved efficiently and accurately.</p>
-          <p>Some examples of my work and impact include:</p>
-          <ul class="impact-list">
-            <li>Cut query bottlenecks by up to 40% for a campus ecosystem servicing over 5,000+ active users through database indexing and advanced SQL query tuning.</li>
-            <li>Reduced manual data entry by 90% for academic compliance reporting by designing and engineering an automated two-way API data integration layer.</li>
-            <li>Accelerated infrastructure performance by building custom internal API gateways using Go (Golang) to offload heavy legacy data strains.</li>
-            <li>Deepened analytical capabilities through intensive hands-on data modeling and business intelligence frameworks at the RevoU Data Analytics Bootcamp.</li>
+    </aside>
+  </div>
+
+  <!-- RECORDS -->
+  <div class="win records" aria-label="Impact metrics">
+    <div class="win-t"><span data-i18n="w.rec">Battle records · verified impact</span><span class="dots"><i>–</i></span></div>
+    <div class="rec">
+      <div><div class="stat">40%</div><p data-i18n="k1">faster query response (SQL tuning, PostgreSQL, 5,000+ users)</p></div>
+      <div><div class="stat">90%</div><p data-i18n="k2">less manual data entry (automated PDDIKTI integration)</p></div>
+      <div><div class="stat">20+</div><p data-i18n="k3">relational tables modeled (OBE curriculum)</p></div>
+      <div><div class="stat">90.91</div><p data-i18n="k4">RevoU Full-stack Data Analytics grade</p></div>
+      <div><div class="stat">5,000+</div><p data-i18n="k5">active institutional users served</p></div>
+    </div>
+  </div>
+
+  <!-- STORY (about) -->
+  <section id="story">
+    <span id="about"></span>
+    <div class="win story">
+      <div class="win-t"><span data-i18n="w.story">Character story · about me</span><span class="dots"><i>–</i><i>×</i></span></div>
+      <div class="win-b">
+        <div>
+          <img src="assets/img/displaypic.png" alt="Portrait of Renaldy Bilal Setyawan" loading="lazy">
+          <dl>
+            <div><dt data-i18n="g.exp">Experience</dt><dd data-i18n="g.expV">6+ years</dd></div>
+            <div><dt data-i18n="a.loc">Location</dt><dd>Surabaya, ID</dd></div>
+            <div><dt data-i18n="a.data">Data</dt><dd>SQL, Python, Tableau</dd></div>
+            <div><dt data-i18n="a.eng">Engineering</dt><dd>Go, PHP, Next.js</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h2 data-i18n="a.h">Bridging engineering rigor and analytics clarity</h2>
+          <p data-i18n="a.p1">Software engineer with a 6+ year foundation in backend and full-stack engineering, and a growing focus on data analytics. I help organizations optimize their data systems, build clean reporting pipelines, and turn complex data schemas into clear, actionable business insights. By bridging rigorous software engineering and modern data analytics (Python, SQL, Tableau), I make sure data is not just analyzed, but retrieved efficiently and accurately.</p>
+          <p data-i18n="a.p2">Some examples of my work and impact include:</p>
+          <ul class="impact">
+            <li data-i18n="a.i1">Cut query bottlenecks by up to 40% for a campus ecosystem servicing over 5,000+ active users through database indexing and advanced SQL query tuning.</li>
+            <li data-i18n="a.i2">Reduced manual data entry by 90% for academic compliance reporting by designing and engineering an automated two-way API data integration layer.</li>
+            <li data-i18n="a.i3">Accelerated infrastructure performance by building custom internal API gateways using Go (Golang) to offload heavy legacy data strains.</li>
+            <li data-i18n="a.i4">Deepened analytical capabilities through intensive hands-on data modeling and business intelligence frameworks at the RevoU Data Analytics Bootcamp.</li>
           </ul>
-          <p>I'm excited about opportunities to collaborate with forward-thinking, remote-first teams looking to elevate their data strategies.</p>
+          <p data-i18n="a.p3">I'm excited about opportunities to collaborate with forward-thinking, remote-first teams — whether the role is data, frontend, backend or fullstack.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============================= SKILLS ============================= -->
-  <section id="skills">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Skills</span>
-        <h2>What I bring to a data team</h2>
-        <p>Grouped by where I'm strongest today, with proficiency driven by real signal — certification tiers where available, years of hands-on use otherwise.</p>
-      </div>
+  <!-- QUESTS (projects) -->
+  <section id="quests">
+    <span id="projects"></span>
+    <div class="head"><span class="px" data-i18n="q.px">COMPLETED QUESTS</span><h2 data-i18n="work.h">Things I've built</h2><p data-i18n="work.p">Seven quests from four places: work commissioned by clients, a product I built and launched myself, production systems from my job, and the data projects on my learning path.</p></div>
 
-      <div class="skills-groups">
-        <div class="skill-group">
-          <h3>Analytics &amp; BI <span class="tag-badge">primary</span></h3>
-
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">SQL</span><span class="skill-tier">Advanced</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:95%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Python</span><span class="skill-tier">Basic / Intermediate</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:55%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Data Visualization</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:75%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Data Analysis</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:75%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Tableau</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:70%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Spreadsheets / Excel</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
-          </div>
+    <div class="win jobs">
+      <div class="win-t"><span data-i18n="w.job">Quest board · filter</span><span class="dots"><i>–</i></span></div>
+      <div class="win-b">
+        <div class="kinds" id="kinds" role="group" aria-label="Filter by quest type"><span class="px" data-i18n="k.lbl">QUEST TYPE</span>
+          <button aria-pressed="true" data-k="all" data-i18n="k.all">All quests</button><button aria-pressed="false" data-k="comm" data-i18n="k.comm">✦ Commission · client</button><button aria-pressed="false" data-k="own" data-i18n="k.own">★ Own product</button><button aria-pressed="false" data-k="main" data-i18n="k.main">◆ Main · at work</button><button aria-pressed="false" data-k="train" data-i18n="k.train">◇ Training · learning</button>
         </div>
-
-        <div class="skill-group">
-          <h3>Engineering Foundation</h3>
-
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Go (Golang)</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:85%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">PHP (Laravel)</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">PostgreSQL</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">MySQL</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:70%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Next.js</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:60%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">JavaScript</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:65%"></div></div>
-          </div>
-        </div>
-
-        <div class="skill-group">
-          <h3>Tools</h3>
-
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Git</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:85%"></div></div>
-          </div>
-          <div class="skill-item">
-            <div class="skill-item-head"><span class="skill-name">Flutter</span><span class="skill-tier">legacy</span></div>
-            <div class="skill-bar-track"><div class="skill-bar-fill" style="width:35%"></div></div>
-          </div>
+        <span class="px jl" data-i18n="k.job">JOB CLASS</span>
+        <div class="job" id="job">
+        <button aria-pressed="true" data-t="all"><div class="emb">★</div><b data-i18n="lens.all">All</b><small>Super Novice</small></button>
+        <button aria-pressed="false" data-t="data" style="--f:var(--data-fill);--i:var(--data-ink)"><div class="emb">S</div><b>Data</b><small>Sage</small></button>
+        <button aria-pressed="false" data-t="fe" style="--f:var(--frontend-fill);--i:var(--frontend-ink)"><div class="emb">H</div><b>Frontend</b><small>Hunter</small></button>
+        <button aria-pressed="false" data-t="be" style="--f:var(--backend-fill);--i:var(--backend-ink)"><div class="emb">B</div><b>Backend</b><small>Blacksmith</small></button>
+        <button aria-pressed="false" data-t="fs" style="--f:var(--fullstack-fill);--i:var(--fullstack-ink)"><div class="emb">K</div><b>Fullstack</b><small>Lord Knight</small></button>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ======================= VERIFIED CREDENTIALS ======================= -->
-  <section id="credentials" class="alt">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Verified Credentials</span>
-        <h2>Checkable, not just claimed</h2>
-        <p>Every analytics claim on this page traces back to a credential ID, a grade, or a dated certificate.</p>
-      </div>
-
-      <div class="credentials-ledger">
-        <div class="credential-head" aria-hidden="true">
-          <span>Credential</span><span>Issuer</span><span>Date</span><span>ID / Grade</span><span>Skills</span><span>Verify</span>
+    <div class="qgrid">
+      <a class="win q q-comm work" href="projects/baraloo.html" data-t="fe be fs" data-k="comm">
+        <div class="win-t"><span class="rar" data-i18n="rar.comm">✦ Commission quest · client</span><span class="slots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="win-b">
+          <div class="shot"><img src="assets/img/baraloo/storefront-desktop.png" alt="Baraloo storefront: baby food (MPASI) shop for Surabaya" loading="lazy"></div>
+          <div class="meta" data-i18n="b.m">Client project · solo · launched 20 Sep 2026</div>
+          <h3>Baraloo — MPASI storefront</h3>
+          <p data-i18n="b.d">An online store for a Surabaya baby-food reseller: 31 products in 5 categories, each with age, serving and storage info, a cart, WhatsApp order confirmation and local delivery — plus an installable admin app (PWA) for the team.</p>
+          <div class="tools">Next.js · Supabase (database + auth) · Tailscale</div>
+          <div class="row" style="margin-bottom:14px"><span class="sticker s-fe">Frontend</span><span class="sticker s-be">Backend</span><span class="sticker s-fs">Fullstack</span></div>
+          <div class="reward"><span class="px" data-i18n="reward">REWARD</span><b data-i18n="b.r">Live store · 31 products online</b></div>
+          <span class="go" data-i18n="case">View case study →</span>
         </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">HackerRank SQL (Advanced)</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">HackerRank</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID 6a055d7ccfd2</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">PostgreSQL</span><span class="cred-tag">SQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
+      </a>
+      <a class="win q q-own work" href="projects/tumbuu.html" data-t="fe be fs" data-k="own">
+        <div class="win-t"><span class="rar" data-i18n="rar.own">★ Own product · live</span><span class="slots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="win-b">
+          <div class="shot"><img src="assets/img/tumbuu/landing-desktop.png" alt="Tumbuu landing page: a parenting tracker with an app preview card" loading="lazy"></div>
+          <div class="meta" data-i18n="t.m">Own product · launched Sep 2026</div>
+          <h3>Tumbuu — parenting tracker</h3>
+          <p data-i18n="t.d">A web app that helps parents log feeding, sleep, diapers, growth (following Buku KIA), illness and moments — then turns those notes into daily and doctor-visit summaries. Free for one child, with a paid Premium tier.</p>
+          <div class="tools">Next.js · PostgreSQL · Better Auth · Cloudflare R2 · Midtrans</div>
+          <div class="row" style="margin-bottom:14px"><span class="sticker s-fe">Frontend</span><span class="sticker s-be">Backend</span><span class="sticker s-fs">Fullstack</span></div>
+          <div class="reward"><span class="px" data-i18n="reward">REWARD</span><b data-i18n="t.r">Live product · free + Premium plans</b></div>
+          <span class="go" data-i18n="case">View case study →</span>
         </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">HackerRank SQL (Intermediate)</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">HackerRank</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID 76b392e3b71b</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">SQL</span><span class="cred-tag">MySQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">HackerRank SQL (Basic)</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">HackerRank</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID 6cef0d14dcd2</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">SQL</span><span class="cred-tag">MySQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">HackerRank Python (Basic)</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">HackerRank</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID c22d9c4ffec3</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">Python</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">HackerRank Problem Solving (Basic)</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">HackerRank</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID f7ed53ad79f4</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">Problem Solving</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">Suhu SQL</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">Ngulik Data</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID m2Gv4S60duO6</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">SQL</span><span class="cred-tag">MySQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">Analisis Campaign Marketing D2C Brand dengan SQL</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">Ngulik Data</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID wMaFTnB5dzu4</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">SQL</span><span class="cred-tag">PostgreSQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">Analisis Penjualan Toko Fashion dengan SQL</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">Ngulik Data</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID -1-2ZQPnz7Xa</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">SQL</span><span class="cred-tag">PostgreSQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">Mahir JOIN</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">Ngulik Data</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID hl1yyLNxv2V1</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">SQL</span><span class="cred-tag">PostgreSQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">SQL 101: Belajar SQL dari Nol</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">Ngulik Data</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jul 2026</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID Qy9SsCkUvCAa</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">SQL</span><span class="cred-tag">MySQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">Full-stack Data Analytics</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">RevoU</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">May 2024</span>
-          <span class="cred-row-label">Grade:</span><span class="cred-id">Grade 90.91</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">Data Visualization</span><span class="cred-tag">Python</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">Computer Program Copyright — SI OBE Adi Buana</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">Dirjen Kekayaan Intelektual</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jun 2025</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID 000911846</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">Laravel</span><span class="cred-tag">PHP</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-
-        <div class="credential-row">
-          <span class="cred-row-label">Credential:</span><span class="cred-name">Computer Program Copyright — SISPAMI Adi Buana</span>
-          <span class="cred-row-label">Issuer:</span><span class="cred-issuer">Dirjen Kekayaan Intelektual</span>
-          <span class="cred-row-label">Date:</span><span class="cred-date">Jun 2025</span>
-          <span class="cred-row-label">ID:</span><span class="cred-id">ID 000911970</span>
-          <span class="cred-row-label">Skills:</span><span class="cred-tags"><span class="cred-tag">Laravel</span><span class="cred-tag">PostgreSQL</span></span>
-          <span class="cred-verify"><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/" target="_blank" rel="noopener" title="View on LinkedIn certifications (direct verification link pending)">Show credential →</a></span>
-        </div>
-      </div>
-
-      <p class="supplementary-list">
-        <span>TOEIC score 920 (2020)</span>
-        <span>Web Developer Level VI, STIKI Malang (2020)</span>
-      </p>
-    </div>
-  </section>
-
-  <!-- ============================= PROJECTS ============================= -->
-  <section id="projects">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Projects</span>
-        <h2>Real work, honestly labeled</h2>
-        <p>Three analytics case studies, plus three data-engineering integrations that move real institutional data day to day. Filter by stack to jump straight to relevant work.</p>
-      </div>
-
-      <div class="stack-filter" role="group" aria-label="Filter projects by stack">
-        <button type="button" class="stack-filter-btn is-active" data-filter="all" aria-pressed="true">All</button>
-        <button type="button" class="stack-filter-btn" data-filter="excel" aria-pressed="false">Excel</button>
-        <button type="button" class="stack-filter-btn" data-filter="python" aria-pressed="false">Python</button>
-        <button type="button" class="stack-filter-btn" data-filter="tableau" aria-pressed="false">Tableau / PowerBI</button>
-        <button type="button" class="stack-filter-btn" data-filter="colab" aria-pressed="false">Google Colab</button>
-        <button type="button" class="stack-filter-btn" data-filter="nextjs" aria-pressed="false">Next.js</button>
-        <button type="button" class="stack-filter-btn" data-filter="golang" aria-pressed="false">Golang</button>
-        <button type="button" class="stack-filter-btn" data-filter="postgresql" aria-pressed="false">PostgreSQL</button>
-      </div>
-
-      <div class="projects-grid">
-        <article class="project-card is-real" data-stacks="python tableau colab">
-          <span class="project-status status-real">Data Analytics</span>
-          <img class="project-thumb" src="assets/img/deepp-dashboard-preview.png" alt="Tableau dashboard summarizing Kickstarter project success trends, backers, categories, and top countries, 2009–2017" loading="lazy">
-          <h3>Kickstarter Projects DEEPP</h3>
-          <p class="project-meta">RevoU · 2024</p>
-          <p>Analyzed 375K+ Kickstarter campaigns (2009–2017) for the traits behind successful launches. Exploratory data analysis in Python; live Tableau dashboard; investor-facing recommendations.</p>
-          <a class="btn btn-secondary project-case-link" href="projects/deepp-kickstarter.html">View case study →</a>
-        </article>
-
-        <article class="project-card is-real" data-stacks="python tableau postgresql">
-          <span class="project-status status-real">Data Analytics</span>
-          <img class="project-thumb" src="assets/img/gayanara/gayanara-dashboard-preview.png" alt="Tableau dashboard for Gayanara e-commerce showing revenue KPIs, monthly trend, top cities, promo impact, courier rates, customer segments, and retention curve" loading="lazy">
-          <h3>Gayanara E-Commerce — Performance Review</h3>
-          <p class="project-meta">Self-directed · 2025</p>
-          <p>End-to-end analytics on a five-table Indonesian fashion e-commerce dataset (10,586 rows): data quality audit, SQL modeling in DuckDB, and seven analytical tasks from revenue trend to cohort retention. Found that Rp 31.4M in discounts produced no measurable basket lift once the comparison was corrected to a like-for-like gross basis. Synthetic dataset — a workflow demonstration, stated as such throughout.</p>
-          <a class="btn btn-secondary project-case-link" href="projects/gayanara-ecommerce.html">View case study →</a>
-        </article>
-
-        <article class="project-card is-real" data-stacks="excel">
-          <span class="project-status status-real">Data Analytics</span>
-          <h3>Bike Buyers Sales Analysis</h3>
-          <p class="project-meta">Alex The Analyst — Data Analyst Bootcamp · 2026</p>
-          <p>Cleaned 1,026 raw customer records down to 1,000, then built pivot tables and charts on income, commute distance, and age bracket to find who actually buys a bike — packaged into a slicer-driven Excel dashboard.</p>
-          <a class="btn btn-secondary project-case-link" href="projects/excel-bike-buyers.html">View case study →</a>
-        </article>
-
-        <article class="project-card is-real-eng" data-stacks="nextjs golang postgresql">
-          <span class="project-status status-engineering">Data Engineering</span>
+      </a>
+      <article class="win q q-eng work" data-t="fe be fs" data-k="main">
+        <div class="win-t"><span class="rar" data-i18n="rar.main">◆ Main quest · at work</span><span class="slots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="win-b">
+          <div class="shot flowviz" role="img" aria-label="System flow: Campus SIAKAD DB , Neo Feeder Importer , PDDIKTI Feeder API"><span class="node">Campus SIAKAD DB</span><i aria-hidden="true">⇅</i><span class="node hot">Neo Feeder Importer</span><i aria-hidden="true">⇅</i><span class="node">PDDIKTI Feeder API</span></div>
+          <div class="meta" data-i18n="e.m">Universitas PGRI Adi Buana Surabaya · 2023 – Present</div>
           <h3>PDDIKTI Integration</h3>
-          <p class="project-meta">Universitas PGRI Adi Buana Surabaya · Aug 2023 – Present</p>
-          <p>Two-way sync layer (Neo Feeder Importer) between the campus academic system and the government's PDDIKTI Feeder API, replacing manual academic-compliance reporting.</p>
-          <p class="project-flow">Campus SIAKAD DB ↔ Neo Feeder Importer ↔ PDDIKTI Feeder API</p>
-          <p class="project-placeholder-note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
-        </article>
-
-        <article class="project-card is-real-eng" data-stacks="nextjs golang postgresql">
-          <span class="project-status status-engineering">Data Engineering</span>
+          <p data-i18n="e1.d">Two-way sync layer (Neo Feeder Importer) between the campus academic system and the government's PDDIKTI Feeder API, replacing manual academic-compliance reporting.</p>
+          <div class="tools">Next.js · Go · PostgreSQL</div>
+          <div class="row" style="margin-bottom:14px"><span class="sticker s-fe">Frontend</span><span class="sticker s-be">Backend</span><span class="sticker s-fs">Fullstack</span></div>
+          <div class="reward"><span class="px" data-i18n="reward">REWARD</span><b data-i18n="e1.r">−90% manual data entry</b></div>
+          <p class="note" data-i18n="e.note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
+        </div>
+      </article>
+      <a class="win q q-data work" href="projects/gayanara-ecommerce.html" data-t="data" data-k="train">
+        <div class="win-t"><span class="rar" data-i18n="rar.train">◇ Training quest · learning path</span><span class="slots" aria-hidden="true"><i class="on"></i><i></i><i></i></span></div>
+        <div class="win-b">
+          <div class="shot"><img src="assets/img/gayanara/gayanara-dashboard-preview.png" alt="Tableau dashboard for Gayanara e-commerce showing revenue KPIs, monthly trend, top cities, promo impact, courier rates, customer segments and retention curve" loading="lazy"></div>
+          <div class="meta" data-i18n="p1.m">Self-directed · 2025</div>
+          <h3>Gayanara E-Commerce — Performance Review</h3>
+          <p data-i18n="p1.d">End-to-end analytics on a five-table Indonesian fashion e-commerce dataset (10,586 rows): data quality audit, SQL modeling in DuckDB, and seven analytical tasks from revenue trend to cohort retention. Found that Rp 31.4M in discounts produced no measurable basket lift once the comparison was corrected to a like-for-like gross basis. Synthetic dataset — a workflow demonstration, stated as such throughout.</p>
+          <div class="tools">Python · SQL (DuckDB) · Tableau · PostgreSQL</div>
+          <div class="row" style="margin-bottom:14px"><span class="sticker s-data">Data</span></div>
+          <div class="reward"><span class="px" data-i18n="reward">REWARD</span><b data-i18n="p1.r">7 analyses · 10,586 rows</b></div>
+          <span class="go" data-i18n="case">View case study →</span>
+        </div>
+      </a>
+      <article class="win q q-eng work" data-t="fe be fs" data-k="main">
+        <div class="win-t"><span class="rar" data-i18n="rar.main">◆ Main quest · at work</span><span class="slots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="win-b">
+          <div class="shot flowviz" role="img" aria-label="System flow: HR / asset records , Sync service , SISTER API"><span class="node">HR / asset records</span><i aria-hidden="true">⇅</i><span class="node hot">Sync service</span><i aria-hidden="true">⇅</i><span class="node">SISTER API</span></div>
+          <div class="meta" data-i18n="e.m">Universitas PGRI Adi Buana Surabaya · 2023 – Present</div>
           <h3>SISTER Integration</h3>
-          <p class="project-meta">Universitas PGRI Adi Buana Surabaya · Aug 2023 – Present</p>
-          <p>Automated, secure cross-platform sync of institutional assets and lecturer profiles with SISTER, per national higher-ed compliance standards.</p>
-          <p class="project-flow">Institutional HR/asset records ↔ Sync service ↔ SISTER</p>
-          <p class="project-placeholder-note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
-        </article>
-
-        <article class="project-card is-real-eng" data-stacks="nextjs golang postgresql">
-          <span class="project-status status-engineering">Data Engineering</span>
+          <p data-i18n="e2.d">Automated, secure cross-platform sync of institutional assets and lecturer profiles with SISTER, per national higher-ed compliance standards.</p>
+          <div class="tools">Next.js · Go · PostgreSQL</div>
+          <div class="row" style="margin-bottom:14px"><span class="sticker s-fe">Frontend</span><span class="sticker s-be">Backend</span><span class="sticker s-fs">Fullstack</span></div>
+          <div class="reward"><span class="px" data-i18n="reward">REWARD</span><b data-i18n="e2.r">Full national-standard compliance</b></div>
+          <p class="note" data-i18n="e.note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
+        </div>
+      </article>
+      <a class="win q q-data work" href="projects/deepp-kickstarter.html" data-t="data" data-k="train">
+        <div class="win-t"><span class="rar" data-i18n="rar.train">◇ Training quest · learning path</span><span class="slots" aria-hidden="true"><i class="on"></i><i></i><i></i></span></div>
+        <div class="win-b">
+          <div class="shot"><img src="assets/img/deepp-dashboard-preview.png" alt="Tableau dashboard summarizing Kickstarter project success trends, backers, categories and top countries, 2009–2017" loading="lazy"></div>
+          <div class="meta">RevoU · 2024</div>
+          <h3>Kickstarter Projects DEEPP</h3>
+          <p data-i18n="p2.d">Analyzed 375K+ Kickstarter campaigns (2009–2017) for the traits behind successful launches. Exploratory data analysis in Python; live Tableau dashboard; investor-facing recommendations.</p>
+          <div class="tools">Python · Google Colab · Tableau</div>
+          <div class="row" style="margin-bottom:14px"><span class="sticker s-data">Data</span></div>
+          <div class="reward"><span class="px" data-i18n="reward">REWARD</span><b data-i18n="p2.r">375K+ campaigns analyzed</b></div>
+          <span class="go" data-i18n="case">View case study →</span>
+        </div>
+      </a>
+      <article class="win q q-eng work" data-t="fe be fs" data-k="main">
+        <div class="win-t"><span class="rar" data-i18n="rar.main">◆ Main quest · at work</span><span class="slots" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i></span></div>
+        <div class="win-b">
+          <div class="shot flowviz" role="img" aria-label="System flow: App events , Notification engine , Qontak API → delivery tracking"><span class="node">App events</span><i aria-hidden="true">↓</i><span class="node hot">Notification engine</span><i aria-hidden="true">↓</i><span class="node">Qontak API → delivery tracking</span></div>
+          <div class="meta" data-i18n="e.m">Universitas PGRI Adi Buana Surabaya · 2023 – Present</div>
           <h3>Qontak Notification Engine</h3>
-          <p class="project-meta">Universitas PGRI Adi Buana Surabaya · Aug 2023 – Present</p>
-          <p>High-volume, real-time notification engine on the Qontak WhatsApp Business API with structured delivery-status tracking for institutional communications.</p>
-          <p class="project-flow">Application events → Notification engine → Qontak API → delivery-status tracking</p>
-          <p class="project-placeholder-note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
-        </article>
-      </div>
+          <p data-i18n="e3.d">High-volume, real-time notification engine on the Qontak WhatsApp Business API with structured delivery-status tracking for institutional communications.</p>
+          <div class="tools">Next.js · Go · PostgreSQL</div>
+          <div class="row" style="margin-bottom:14px"><span class="sticker s-fe">Frontend</span><span class="sticker s-be">Backend</span><span class="sticker s-fs">Fullstack</span></div>
+          <div class="reward"><span class="px" data-i18n="reward">REWARD</span><b data-i18n="e3.r">Real-time delivery tracking</b></div>
+          <p class="note" data-i18n="e.note">Internal institutional system — no shareable screenshots or data; described here as verified system/data flow only.</p>
+        </div>
+      </article>
     </div>
   </section>
 
-  <!-- ============================= EXPERIENCE ============================= -->
-  <section id="experience" class="alt">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Experience</span>
-        <h2>Where the numbers came from</h2>
-      </div>
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="head"><span class="px" data-i18n="s.px">SKILL TREE</span><h2 data-i18n="skills.h">How I work</h2><p data-i18n="skills.p">Grouped by job class, with levels driven by real signal — certification tiers where available, years of hands-on use otherwise.</p></div>
+    <div class="grid">
+      <div class="win skills s-be"><div class="win-t"><span>Blacksmith · Backend</span></div><div class="win-b">
+        <div class="sk"><span class="ico">GO</span><span>Go (Golang)</span><span class="px">Lv 9/10</span></div>
+        <div class="sk"><span class="ico">LV</span><span>PHP (Laravel)</span><span class="px">Lv 8/10</span></div>
+        <div class="sk"><span class="ico">PG</span><span>PostgreSQL</span><span class="px">Lv 8/10</span></div>
+        <div class="sk"><span class="ico">MY</span><span>MySQL</span><span class="px">Lv 7/10</span></div>
+      </div></div>
+      <div class="win skills s-data"><div class="win-t"><span>Sage · Data</span></div><div class="win-b">
+        <div class="sk"><span class="ico">SQ</span><span>SQL<small>Advanced</small></span><span class="px">Lv 10/10</span></div>
+        <div class="sk"><span class="ico">XL</span><span>Spreadsheets / Excel</span><span class="px">Lv 8/10</span></div>
+        <div class="sk"><span class="ico">DV</span><span>Data Visualization</span><span class="px">Lv 8/10</span></div>
+        <div class="sk"><span class="ico">DA</span><span>Data Analysis</span><span class="px">Lv 8/10</span></div>
+        <div class="sk"><span class="ico">TB</span><span>Tableau</span><span class="px">Lv 7/10</span></div>
+        <div class="sk"><span class="ico">PY</span><span>Python<small>Basic / Intermediate</small></span><span class="px">Lv 6/10</span></div>
+      </div></div>
+      <div class="win skills s-fe"><div class="win-t"><span>Hunter · Frontend</span></div><div class="win-b">
+        <div class="sk"><span class="ico">JS</span><span>JavaScript</span><span class="px">Lv 7/10</span></div>
+        <div class="sk"><span class="ico">NX</span><span>Next.js</span><span class="px">Lv 6/10</span></div>
+        <div class="sk"><span class="ico">FL</span><span>Flutter<small>legacy</small></span><span class="px">Lv 4/10</span></div>
+      </div></div>
+      <div class="win skills s-fs"><div class="win-t"><span>Lord Knight · Fullstack</span></div><div class="win-b">
+        <div class="sk"><span class="ico">GT</span><span>Git</span><span class="px">Lv 9/10</span></div>
+        <div class="sk"><span class="ico">LP</span><span>Laravel + PostgreSQL</span><span class="px">Lv 8/10</span></div>
+        <div class="sk"><span class="ico">NG</span><span>Next.js + Go</span><span class="px">Lv 7/10</span></div>
+      </div></div>
+    </div>
+  </section>
 
-      <div class="timeline">
-        <div class="timeline-item">
-          <h3 class="timeline-role">Web Developer <span class="timeline-org">· Universitas PGRI Adi Buana Surabaya</span></h3>
-          <p class="timeline-meta">Full-time · Aug 2023 – Present · Surabaya, on-site</p>
-          <p class="timeline-summary">Engineered and optimized the university's core data layer, transitionary API infrastructure, and database ecosystems, serving over 5,000 active institutional users. Focused heavily on resolving data bottlenecks, automating cross-governmental schema syncs, and translating complex curriculum requirements into functional data models.</p>
-          <ul class="timeline-bullets">
-            <li><strong>Automated Data Integration Pipelines (PDDIKTI):</strong> designed and engineered a dedicated integration layer (Neo Feeder Importer) to handle two-way data synchronization with the official government PDDIKTI Feeder API, reducing manual data entry workloads for academic staff by 90%.</li>
-            <li><strong>End-to-End Data Synchronization (SISTER):</strong> developed backend integration infrastructure to automate the secure, cross-platform synchronization of large-scale institutional assets and lecturer profiles, maintaining full data compliance with national higher education standards via the SISTER Kemdiktisaintek API.</li>
-            <li><strong>Real-Time Data Communication Tracking (Qontak):</strong> architected a high-volume notification engine integrated with the enterprise Qontak WhatsApp Business API, automating institutional broadcasting workflows and establishing structured tracking pipelines for real-time delivery data.</li>
-            <li><strong>Database Optimization &amp; Query Tuning:</strong> implemented strategic database indexing and optimized complex SQL queries in PostgreSQL, cutting average system data response times by up to 40% for high-volume academic platforms.</li>
-            <li><strong>Relational Data Modeling:</strong> spearheaded the translation of the government's Outcome-Based Education (OBE) curriculum requirements into structured relational database schemas, designing and managing 20+ optimized tables within the platform's foundation.</li>
+  <!-- ACHIEVEMENTS -->
+  <section id="achievements">
+    <span id="credentials"></span>
+    <div class="head"><span class="px" data-i18n="ach.px">ACHIEVEMENTS UNLOCKED · 7</span><h2 data-i18n="c.h">Checkable, not just claimed</h2><p data-i18n="c.p">Every claim on this page traces back to a credential ID, a grade, or a dated certificate. Hover or tap a badge to inspect it.</p></div>
+    <div class="ach" id="ach"></div>
+      </section>
+
+  <!-- QUEST LOG -->
+  <section id="log">
+    <span id="experience"></span>
+    <div class="head"><span class="px" data-i18n="log.px">QUEST LOG</span><h2 data-i18n="exp.h">Where I've worked</h2></div>
+    <div class="log">
+      <div class="win entry"><div class="win-t"><span data-i18n="w.main">Main quest</span><span class="dots"><i>–</i></span></div><div class="win-b">
+        <div>
+          <div class="when">AUG 2023 — <span data-i18n="now">PRESENT</span></div>
+          <div class="meta" data-i18n="x1.m">Full-time · Surabaya, on-site</div>
+          <span class="tag" data-i18n="inprog">IN PROGRESS</span>
+          <div class="row"><span class="sticker s-fe">Frontend</span><span class="sticker s-be">Backend</span><span class="sticker s-data">Data</span><span class="sticker s-fs">Fullstack</span></div>
+        </div>
+        <div>
+          <h3>Web Developer<small>Universitas PGRI Adi Buana Surabaya</small></h3>
+          <p data-i18n="x1.s">Engineered and optimized the university's core data layer, transitionary API infrastructure, and database ecosystems, serving over 5,000 active institutional users. Focused heavily on resolving data bottlenecks, automating cross-governmental schema syncs, and translating complex curriculum requirements into functional data models.</p>
+          <ul>
+            <li data-i18n="x1.1"><b>Automated Data Integration Pipelines (PDDIKTI):</b> designed and engineered a dedicated integration layer (Neo Feeder Importer) to handle two-way data synchronization with the official government PDDIKTI Feeder API, reducing manual data entry workloads for academic staff by 90%.</li>
+            <li data-i18n="x1.2"><b>End-to-End Data Synchronization (SISTER):</b> developed backend integration infrastructure to automate the secure, cross-platform synchronization of large-scale institutional assets and lecturer profiles, maintaining full data compliance with national higher education standards via the SISTER Kemdiktisaintek API.</li>
+            <li data-i18n="x1.3"><b>Real-Time Data Communication Tracking (Qontak):</b> architected a high-volume notification engine integrated with the enterprise Qontak WhatsApp Business API, automating institutional broadcasting workflows and establishing structured tracking pipelines for real-time delivery data.</li>
+            <li data-i18n="x1.4"><b>Database Optimization &amp; Query Tuning:</b> implemented strategic database indexing and optimized complex SQL queries in PostgreSQL, cutting average system data response times by up to 40% for high-volume academic platforms.</li>
+            <li data-i18n="x1.5"><b>Relational Data Modeling:</b> spearheaded the translation of the government's Outcome-Based Education (OBE) curriculum requirements into structured relational database schemas, designing and managing 20+ optimized tables within the platform's foundation.</li>
           </ul>
         </div>
-
-        <div class="timeline-item">
-          <h3 class="timeline-role">Software Developer <span class="timeline-org">· Strugg House</span></h3>
-          <p class="timeline-meta">Freelance · Jan 2018 – Present · Malang, remote</p>
-          <p class="timeline-summary">Co-founded a software and creative house business, managing end-to-end product delivery, backend data architecture, and custom client management portals. Partnered closely with retail and enterprise clients to translate operational business requirements into scalable relational databases and real-time transaction pipelines.</p>
-          <ul class="timeline-bullets">
-            <li><strong>Data Infrastructure &amp; Low-Latency Processing:</strong> self-taught and deployed low-latency Point of Sale (POS) transaction processing engines using Go (Golang), ensuring rapid data ingestion and high-integrity handling of high-volume retail client transaction data.</li>
-            <li><strong>Operational Reporting &amp; Dashboards:</strong> partnered with corporate clients to coordinate the end-to-end delivery of custom client management portals, engineering internal operational backend services and Next.js frontends to handle purchasing data pipelines and internal analytical dashboards.</li>
-            <li><strong>Agile Delivery Optimization:</strong> implemented streamlined agile development methodologies and modern AI-assisted engineering workflows across client projects, resulting in a 25% reduction in project completion time and faster iterative prototyping.</li>
+      </div></div>
+      <div class="win entry"><div class="win-t"><span data-i18n="w.guild">Guild quest</span><span class="dots"><i>–</i></span></div><div class="win-b">
+        <div>
+          <div class="when">JAN 2018 — <span data-i18n="now">PRESENT</span></div>
+          <div class="meta" data-i18n="x2.m">Freelance · Malang, remote</div>
+          <span class="tag" data-i18n="inprog">IN PROGRESS</span>
+          <div class="row"><span class="sticker s-be">Backend</span><span class="sticker s-fe">Frontend</span><span class="sticker s-fs">Fullstack</span></div>
+        </div>
+        <div>
+          <h3>Software Developer<small>Strugg House</small></h3>
+          <p data-i18n="x2.s">Co-founded a software and creative house business, managing end-to-end product delivery, backend data architecture, and custom client management portals. Partnered closely with retail and enterprise clients to translate operational business requirements into scalable relational databases and real-time transaction pipelines.</p>
+          <ul>
+            <li data-i18n="x2.1"><b>Data Infrastructure &amp; Low-Latency Processing:</b> self-taught and deployed low-latency Point of Sale (POS) transaction processing engines using Go (Golang), ensuring rapid data ingestion and high-integrity handling of high-volume retail client transaction data.</li>
+            <li data-i18n="x2.2"><b>Operational Reporting &amp; Dashboards:</b> partnered with corporate clients to coordinate the end-to-end delivery of custom client management portals, engineering internal operational backend services and Next.js frontends to handle purchasing data pipelines and internal analytical dashboards.</li>
+            <li data-i18n="x2.3"><b>Agile Delivery Optimization:</b> implemented streamlined agile development methodologies and modern AI-assisted engineering workflows across client projects, resulting in a 25% reduction in project completion time and faster iterative prototyping.</li>
           </ul>
         </div>
-      </div>
-
-      <details class="archived-role">
-        <summary class="archived-summary">Mobile Developer · CV. Birunet Media Komputindo (archived) <span class="visually-hidden">— expand for details</span></summary>
-        <div class="archived-body">
-          <p class="timeline-meta">Internship · Jun 2018 – Aug 2019 · Malang, hybrid</p>
-          <ul class="timeline-bullets">
-            <li>Flutter UI work; 20% reduction in app loading time via data-fetching optimization; 0% error rate at release.</li>
-          </ul>
+      </div></div>
+      <details class="win side">
+        <summary class="win-t"><span><span data-i18n="w.side">Side quest · completed</span> — Mobile Developer · CV. Birunet Media Komputindo</span></summary>
+        <div class="win-b">
+          <div class="when">JUN 2018 — AUG 2019</div>
+          <div class="meta" data-i18n="x3.m">Internship · Malang, hybrid</div>
+          <span class="tag done" data-i18n="done">COMPLETED</span>
+          <ul style="margin:12px 0 0;padding-left:20px;color:var(--ink-soft)"><li data-i18n="x3.1">Flutter UI work; 20% reduction in app loading time via data-fetching optimization; 0% error rate at release.</li></ul>
         </div>
       </details>
     </div>
   </section>
 
-  <!-- ======================= EDUCATION + CONTACT ======================= -->
-  <div class="edu-contact-band">
-    <div class="wrap split-grid">
-      <section id="education">
-        <div class="section-head">
-          <span class="eyebrow">Education</span>
-          <h2>Formal foundation</h2>
+
+  <!-- TRAINING + CONTACT -->
+  <section id="contact">
+    <span id="education"></span>
+    <div class="ec">
+      <div class="win">
+        <div class="win-t"><span data-i18n="edu.h">Training grounds · education</span><span class="dots"><i>–</i></span></div>
+        <div class="win-b">
+          <div class="edu"><h3>RevoU</h3><div class="meta" data-i18n="edu1.m">Full-stack Data Analytics · Jan 2024 – May 2024 · Grade 90.91</div><p data-i18n="edu1.d">Python, SQL, spreadsheets, Tableau; analyzing, visualizing, and interpreting data to drive decisions.</p></div>
+          <div class="edu"><h3>STIKI Malang</h3><div class="meta" data-i18n="edu2.m">B.Sc. Information Technology · Jun 2016 – Aug 2023</div><p data-i18n="edu2.d">Thesis: "Rancang Bangun Aplikasi Travel Berbasis Android"</p></div>
         </div>
-
-        <div class="edu-item">
-          <h3>RevoU</h3>
-          <p class="edu-meta">Full-stack Data Analytics · Jan 2024 – May 2024 · Grade 90.91</p>
-          <p>Python, SQL, spreadsheets, Tableau; analyzing, visualizing, and interpreting data to drive decisions.</p>
-        </div>
-
-        <div class="edu-item">
-          <h3>STIKI Malang</h3>
-          <p class="edu-meta">B.Sc. Information Technology · Jun 2016 – Aug 2023</p>
-          <p>Thesis: "Rancang Bangun Aplikasi Travel Berbasis Android"</p>
-        </div>
-      </section>
-
-      <section id="contact">
-        <div class="section-head">
-          <span class="eyebrow">Contact</span>
-          <h2>Let's talk data</h2>
-        </div>
-
-        <ul class="contact-list">
-          <li>
-            <svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg>
-            <a href="mailto:renaldybys@gmail.com">renaldybys@gmail.com</a>
-          </li>
-          <li>
-            <svg class="icon" aria-hidden="true"><use href="#icon-pin"></use></svg>
-            <a href="https://www.google.com/maps/search/?api=1&query=Surabaya%2C+East+Java%2C+Indonesia" target="_blank" rel="noopener">Surabaya, East Java, Indonesia</a>
-          </li>
-          <li>
-            <svg class="icon" aria-hidden="true"><use href="#icon-github"></use></svg>
-            <a href="https://github.com/renalazy" target="_blank" rel="noopener">github.com/renalazy</a>
-          </li>
-          <li>
-            <svg class="icon" aria-hidden="true"><use href="#icon-linkedin"></use></svg>
-            <a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener">linkedin.com/in/renaldy-bilal-setyawan</a>
-          </li>
-        </ul>
-
-        <form class="contact-form" id="contact-form">
-          <p class="form-note">This is a static site — submitting opens your email client with the message pre-filled (no server-side handling).</p>
-          <div class="form-row">
-            <div class="field">
-              <label for="cf-name">Name</label>
-              <input type="text" id="cf-name" name="name" autocomplete="name" required>
+      </div>
+      <div class="win">
+        <div class="win-t"><span data-i18n="ct.h">Whisper · contact</span><span class="dots"><i>–</i><i>×</i></span></div>
+        <div class="win-b">
+          <ul class="contact-list">
+            <li><a href="mailto:renaldybys@gmail.com"><svg class="icon"><use href="#i-mail"/></svg>renaldybys@gmail.com</a></li>
+            <li><a href="https://www.google.com/maps/search/?api=1&amp;query=Surabaya%2C+East+Java%2C+Indonesia" target="_blank" rel="noopener"><svg class="icon"><use href="#i-pin"/></svg>Surabaya, East Java, Indonesia</a></li>
+            <li><a href="https://github.com/renalazy" target="_blank" rel="noopener"><svg class="icon"><use href="#i-gh"/></svg>github.com/renalazy</a></li>
+            <li><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener"><svg class="icon"><use href="#i-in"/></svg>linkedin.com/in/renaldy-bilal-setyawan</a></li>
+            <li><a href="https://www.instagram.com/renxietyyyy/" target="_blank" rel="noopener"><svg class="icon"><use href="#i-ig"/></svg>instagram.com/renxietyyyy</a></li>
+          </ul>
+          <form id="contact-form">
+            <p class="form-note" data-i18n="f.note">Submitting opens your email app with the message pre-filled — nothing is stored on a server.</p>
+            <div class="form-row">
+              <div><label for="cf-name" data-i18n="f.name">NAME</label><input type="text" id="cf-name" name="name" autocomplete="name" required></div>
+              <div><label for="cf-email">EMAIL</label><input type="email" id="cf-email" name="email" autocomplete="email" required></div>
             </div>
-            <div class="field">
-              <label for="cf-email">Email</label>
-              <input type="email" id="cf-email" name="email" autocomplete="email" required>
-            </div>
-          </div>
-          <div class="field">
-            <label for="cf-message">Message</label>
-            <textarea id="cf-message" name="message" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Send via email</button>
-        </form>
-      </section>
+            <div><label for="cf-message" data-i18n="f.msg">MESSAGE</label><textarea id="cf-message" name="message" required></textarea></div>
+            <button type="submit" class="btn btn--primary"><span data-i18n="f.send">Send via email</span><small data-i18n="f.sends">SEND WHISPER</small></button>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
+  <!-- PARTY INVITE -->
+  <section>
+    <div class="win invite">
+      <div class="win-t"><span data-i18n="w.party">Party invitation · open requests</span><span class="dots"><i>×</i></span></div>
+      <div class="win-b">
+        <div class="npc-name" data-i18n="inv.n">[Renaldy] invites you to a party.</div>
+        <h2 data-i18n="inv.h">Ready to team up?</h2>
+        <p data-i18n="inv.p">Hiring for data, frontend, backend or fullstack — or need a website or app built? I usually reply within a day.</p>
+        <div class="quests">
+          <div class="req"><span class="px" data-i18n="rq.a">HIRING QUEST</span><b data-i18n="rq.a1">Full-time role</b><small data-i18n="rq.a2">Data · frontend · backend · fullstack · remote or hybrid</small></div>
+          <div class="req"><span class="px" data-i18n="rq.b">COMMISSION QUEST</span><b data-i18n="rq.b1">Build a website or app</b><small data-i18n="rq.b2">Online stores, landing pages, admin panels, dashboards &amp; tools</small></div>
+        </div>
+        <div class="row">
+          <a class="btn btn--primary" href="mailto:renaldybys@gmail.com?subject=Job%20opportunity"><span data-i18n="inv.a">Accept · Email me</span><small data-i18n="inv.as">JOIN PARTY</small></a>
+          <a class="btn" href="mailto:renaldybys@gmail.com?subject=Project%20request%3A%20website%20%2F%20app"><span data-i18n="inv.b">Request a build</span><small data-i18n="inv.bs">POST COMMISSION</small></a>
+          <a class="btn" href="#main" id="invite-cv"><span data-i18n="cta.cv">Download CV</span><small data-i18n="cta.cvs">VIEW EQUIPMENT</small></a>
+        </div>
+      </div>
+    </div>
+    <div class="chat" aria-label="Chat log">
+      <div class="sys" data-i18n="chat1">[System] Renaldy has logged in. Status: open to work.</div>
+      <div><b>[Renaldy]</b> <span data-i18n="chat2">Thanks for visiting! Whisper me anytime —</span> renaldybys@gmail.com</div>
+    </div>
+  </section>
 </main>
 
-<footer class="site-footer">
-  <div class="wrap footer-inner">
-    <span>© <span id="current-year">2026</span> Renaldy Bilal Setyawan. Static site, no backend.</span>
-    <div class="footer-links">
-      <a href="https://github.com/renalazy" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#icon-github"></use></svg>GitHub</a>
-      <a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#icon-linkedin"></use></svg>LinkedIn</a>
-      <a href="mailto:renaldybys@gmail.com"><svg class="icon" aria-hidden="true"><use href="#icon-mail"></use></svg>Email</a>
-      <a href="#home">Back to top</a>
-    </div>
-  </div>
-</footer>
+<footer class="site"><div class="wrap">
+  <span>© <span id="current-year">2026</span> Renaldy Bilal Setyawan</span>
+  <span><a href="https://github.com/renalazy" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.instagram.com/renxietyyyy/" target="_blank" rel="noopener">Instagram</a><a href="mailto:renaldybys@gmail.com">Email</a><a href="#main" data-i18n="top">Back to top</a></span>
+</div></footer>
 
-<script src="assets/js/main.js?v=2"></script>
+<script>
+// Achievements — one place to edit. [name, issuer, date, id/grade, skills, rarity, gem label]
+const CERT_URL = 'https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/details/certifications/';
+const RAR = {leg:'LEGENDARY',epic:'EPIC',rare:'RARE',common:'COMMON'};
+const CREDS = [
+  ['HackerRank SQL (Advanced)','HackerRank','Jul 2026','ID 6a055d7ccfd2',['PostgreSQL','SQL'],'leg','SQL'],
+  ['Full-stack Data Analytics','RevoU','May 2024','Grade 90.91',['Data Visualization','Python'],'leg','90.9'],
+  ['Computer Program Copyright — SI OBE Adi Buana','Dirjen Kekayaan Intelektual','Jun 2025','ID 000911846',['Laravel','PHP'],'epic','©'],
+  ['Computer Program Copyright — SISPAMI Adi Buana','Dirjen Kekayaan Intelektual','Jun 2025','ID 000911970',['Laravel','PostgreSQL'],'epic','©'],
+  ['Suhu SQL','Ngulik Data','Jul 2026','ID m2Gv4S60duO6',['SQL','MySQL'],'epic','SQL'],
+  ['Analisis Campaign Marketing D2C Brand dengan SQL','Ngulik Data','Jul 2026','ID wMaFTnB5dzu4',['SQL','PostgreSQL'],'rare','D2C'],
+  ['Analisis Penjualan Toko Fashion dengan SQL','Ngulik Data','Jul 2026','ID -1-2ZQPnz7Xa',['SQL','PostgreSQL'],'rare','FSH']
+];
+document.getElementById('ach').innerHTML = CREDS.map(([n,i,d,id,s,r,g]) =>
+  `<div class="badge r-${r}" tabindex="0"><div class="gem">${g}</div><div><b>${n}</b><small>${i} · ${d}</small><a href="${CERT_URL}" target="_blank" rel="noopener"><span data-i18n="c.show">Show credential</span> →</a></div><div class="tip" role="tooltip"><span class="px">${RAR[r]} · ${s[0].toUpperCase()}</span><span>${id} · ${s.join(', ')}</span></div></div>`).join('');
+
+window.I18N_ID = {
+  "nav.work":"Misi","nav.about":"Kisah","nav.skills":"Keahlian","nav.creds":"Pencapaian","nav.exp":"Log misi","nav.contact":"Kontak","top":"Kembali ke atas",
+  "w.welcome":"Selamat datang, petualang","w.info":"Info dasar","w.rec":"Catatan pertempuran · dampak terverifikasi","w.story":"Kisah karakter · tentang saya","w.job":"Papan misi · filter",
+  "w.main":"Misi utama","w.guild":"Misi guild","w.side":"Misi sampingan · selesai","w.party":"Undangan party · permintaan terbuka",
+  "hero.meta":"Software engineer · Surabaya, Jawa Timur, Indonesia",
+  "hero.h1":"Halo, saya Renaldy.<br>Siap bergabung dengan <span class=\"hl\">party-mu</span>.",
+  "hero.lead":"Enam tahun menyelesaikan misi di seluruh lapisan — sistem backend, antarmuka, dashboard, dan data. Saya membawa kerja yang tenang, komunikasi yang jelas, dan hasil yang benar-benar rilis.",
+  "hero.next":"Lihat karya saya",
+  "lv.base":"BASE LV · TAHUN","lv.job":"JOB LV · BIDANG","hp":"HP · ketersediaan","hpv":"Terbuka untuk kerja","sp":"SP · fokus","spv":"Data &amp; web","agi":"−25% waktu","mode":"Remote / hybrid",
+  "lens.all":"Semua","g.exp":"Pengalaman","g.expV":"6+ tahun",
+  "cta.cv":"Unduh CV","cta.cvs":"LIHAT EQUIPMENT","cv.ats":"PDF ramah ATS","cta.touch":"Hubungi saya","cta.touchs":"KIRIM WHISPER",
+  "k1":"respons query lebih cepat (tuning SQL, PostgreSQL, 5.000+ pengguna)","k2":"lebih sedikit input data manual (integrasi PDDIKTI otomatis)","k3":"tabel relasional dimodelkan (kurikulum OBE)","k4":"nilai RevoU Full-stack Data Analytics","k5":"pengguna aktif institusi dilayani",
+  "a.loc":"Lokasi","a.data":"Data","a.eng":"Engineering","a.h":"Menjembatani ketelitian engineering dan kejelasan analitik",
+  "a.p1":"Software engineer dengan fondasi 6+ tahun di backend dan full-stack engineering, dan fokus yang terus tumbuh di data analytics. Saya membantu organisasi mengoptimalkan sistem data, membangun pipeline laporan yang rapi, dan mengubah skema data yang kompleks menjadi insight bisnis yang jelas dan bisa ditindaklanjuti. Dengan menjembatani software engineering dan data analytics modern (Python, SQL, Tableau), saya memastikan data tidak hanya dianalisis, tapi juga diambil secara efisien dan akurat.",
+  "a.p2":"Beberapa contoh pekerjaan dan dampaknya:",
+  "a.i1":"Memangkas bottleneck query hingga 40% untuk ekosistem kampus dengan 5.000+ pengguna aktif melalui indexing database dan tuning query SQL.",
+  "a.i2":"Mengurangi input data manual hingga 90% untuk pelaporan kepatuhan akademik dengan merancang layer integrasi data API dua arah yang otomatis.",
+  "a.i3":"Mempercepat performa infrastruktur dengan membangun API gateway internal menggunakan Go (Golang) untuk mengurangi beban data legacy.",
+  "a.i4":"Memperdalam kemampuan analitik lewat praktik data modeling dan business intelligence di RevoU Data Analytics Bootcamp.",
+  "a.p3":"Saya antusias berkolaborasi dengan tim yang progresif dan remote-first — baik untuk peran data, frontend, backend maupun fullstack.",
+  "q.px":"MISI SELESAI","work.h":"Yang pernah saya buat","work.p":"Tujuh misi dari empat sumber: pesanan klien, produk yang saya bangun dan luncurkan sendiri, sistem produksi dari pekerjaan saya, dan proyek data di jalur belajar saya.",
+  "rar.main":"◆ Misi utama · di kantor","rar.train":"◇ Misi latihan · jalur belajar","rar.own":"★ Produk sendiri · live","t.m":"Produk sendiri · rilis Sep 2026","t.d":"Aplikasi web yang membantu orang tua mencatat menyusui, tidur, popok, tumbuh kembang (mengikuti Buku KIA), sakit dan momen — lalu merapikannya jadi ringkasan harian dan ringkasan konsultasi dokter. Gratis untuk satu anak, dengan paket Premium berbayar.","t.r":"Produk live · paket gratis + Premium","k.lbl":"JENIS MISI","k.all":"Semua misi","k.own":"★ Produk sendiri","k.comm":"✦ Komisi · klien","rar.comm":"✦ Misi komisi · klien","b.m":"Proyek klien · solo · rilis 20 Sep 2026","b.d":"Toko online untuk reseller MPASI di Surabaya: 31 produk dalam 5 kategori, masing-masing dengan info usia, penyajian, dan penyimpanan, keranjang, konfirmasi pesanan via WhatsApp, dan antar lokal — plus aplikasi admin (PWA) yang bisa dipasang tim.","b.r":"Toko live · 31 produk online","k.main":"◆ Utama · di kantor","k.train":"◇ Latihan · belajar","k.job":"JOB CLASS","reward":"HADIAH","e.m":"Universitas PGRI Adi Buana Surabaya · 2023 – Sekarang",
+  "p1.m":"Proyek mandiri · 2025",
+  "p1.d":"Analitik end-to-end pada dataset e-commerce fashion Indonesia lima tabel (10.586 baris): audit kualitas data, modeling SQL di DuckDB, dan tujuh analisis dari tren pendapatan hingga cohort retention. Menemukan bahwa diskon Rp 31,4 jt tidak menaikkan nilai keranjang secara terukur setelah perbandingan dikoreksi ke basis gross yang setara. Dataset sintetis — demonstrasi alur kerja, dinyatakan jelas di seluruh laporan.",
+  "p1.r":"7 analisis · 10.586 baris",
+  "p2.d":"Menganalisis 375K+ kampanye Kickstarter (2009–2017) untuk menemukan ciri peluncuran yang sukses. Eksplorasi data dengan Python; dashboard Tableau; rekomendasi untuk investor.","p2.r":"375K+ kampanye dianalisis",
+  "p3.d":"Membersihkan 1.026 data pelanggan mentah menjadi 1.000, lalu membuat pivot table dan grafik berdasarkan pendapatan, jarak tempuh, dan kelompok usia untuk mengetahui siapa yang benar-benar membeli sepeda — dikemas dalam dashboard Excel dengan slicer.","p3.r":"1.000 data bersih · 1 dashboard",
+  "case":"Lihat studi kasus →",
+  "e1.d":"Layer sinkronisasi dua arah (Neo Feeder Importer) antara sistem akademik kampus dan PDDIKTI Feeder API pemerintah, menggantikan pelaporan kepatuhan akademik manual.","e1.r":"−90% input data manual",
+  "e2.d":"Sinkronisasi lintas platform yang otomatis dan aman untuk aset institusi dan profil dosen dengan SISTER, sesuai standar kepatuhan pendidikan tinggi nasional.","e2.r":"Patuh standar nasional sepenuhnya",
+  "e3.d":"Mesin notifikasi real-time bervolume tinggi di atas Qontak WhatsApp Business API dengan pelacakan status pengiriman yang terstruktur.","e3.r":"Pelacakan pengiriman real-time",
+  "e.note":"Sistem internal institusi — tidak ada screenshot atau data yang bisa dibagikan; dijelaskan sebagai alur sistem/data yang terverifikasi.",
+  "s.px":"POHON SKILL","skills.h":"Cara saya bekerja","skills.p":"Dikelompokkan per job class, dengan level berdasarkan bukti nyata — tingkat sertifikasi bila ada, atau lama penggunaan langsung.",
+  "ach.px":"PENCAPAIAN TERBUKA · 7","c.h":"Bisa dicek, bukan sekadar klaim","c.p":"Setiap klaim di halaman ini bisa ditelusuri ke ID sertifikat, nilai, atau sertifikat bertanggal. Arahkan atau ketuk badge untuk melihat detailnya.","c.show":"Lihat sertifikat",
+  "log.px":"LOG MISI","exp.h":"Tempat saya bekerja","now":"SEKARANG","inprog":"SEDANG BERJALAN","done":"SELESAI",
+  "x1.m":"Full-time · Surabaya, on-site",
+  "x1.s":"Merancang dan mengoptimalkan data layer inti universitas, infrastruktur API transisi, dan ekosistem database untuk lebih dari 5.000 pengguna aktif. Fokus pada penyelesaian bottleneck data, otomatisasi sinkronisasi skema lintas instansi pemerintah, dan menerjemahkan kebutuhan kurikulum menjadi model data yang fungsional.",
+  "x1.1":"<b>Pipeline Integrasi Data Otomatis (PDDIKTI):</b> merancang layer integrasi khusus (Neo Feeder Importer) untuk sinkronisasi data dua arah dengan PDDIKTI Feeder API resmi pemerintah, mengurangi beban input data manual staf akademik hingga 90%.",
+  "x1.2":"<b>Sinkronisasi Data End-to-End (SISTER):</b> membangun infrastruktur integrasi backend untuk sinkronisasi lintas platform yang aman atas aset institusi dan profil dosen berskala besar, menjaga kepatuhan data terhadap standar pendidikan tinggi nasional melalui SISTER Kemdiktisaintek API.",
+  "x1.3":"<b>Pelacakan Komunikasi Data Real-Time (Qontak):</b> merancang mesin notifikasi bervolume tinggi yang terintegrasi dengan Qontak WhatsApp Business API, mengotomatiskan alur broadcast institusi dan membangun pipeline pelacakan data pengiriman secara real-time.",
+  "x1.4":"<b>Optimasi Database &amp; Tuning Query:</b> menerapkan indexing database dan mengoptimalkan query SQL kompleks di PostgreSQL, memangkas rata-rata waktu respons data hingga 40% pada platform akademik bervolume tinggi.",
+  "x1.5":"<b>Pemodelan Data Relasional:</b> memimpin penerjemahan kebutuhan kurikulum Outcome-Based Education (OBE) pemerintah menjadi skema database relasional, merancang dan mengelola 20+ tabel yang teroptimasi.",
+  "x2.m":"Freelance · Malang, remote",
+  "x2.s":"Ikut mendirikan software & creative house, mengelola delivery produk end-to-end, arsitektur data backend, dan portal manajemen klien. Bekerja erat dengan klien retail dan korporat untuk menerjemahkan kebutuhan operasional menjadi database relasional yang skalabel dan pipeline transaksi real-time.",
+  "x2.1":"<b>Infrastruktur Data &amp; Pemrosesan Low-Latency:</b> mempelajari secara mandiri dan men-deploy mesin pemrosesan transaksi Point of Sale (POS) berlatensi rendah menggunakan Go (Golang), memastikan data transaksi retail bervolume tinggi masuk dengan cepat dan akurat.",
+  "x2.2":"<b>Laporan Operasional &amp; Dashboard:</b> bersama klien korporat mengkoordinasikan delivery portal manajemen klien end-to-end, membangun layanan backend operasional dan frontend Next.js untuk pipeline data pembelian dan dashboard analitik internal.",
+  "x2.3":"<b>Optimasi Delivery Agile:</b> menerapkan metodologi agile yang ramping dan alur kerja engineering berbantuan AI di proyek klien, memangkas waktu penyelesaian proyek hingga 25% dan mempercepat prototyping.",
+  "x3.m":"Magang · Malang, hybrid",
+  "x3.1":"Pengerjaan UI Flutter; waktu loading aplikasi berkurang 20% lewat optimasi pengambilan data; 0% error saat rilis.",
+  "edu.h":"Tempat latihan · pendidikan","edu1.m":"Full-stack Data Analytics · Jan 2024 – Mei 2024 · Nilai 90,91","edu1.d":"Python, SQL, spreadsheet, Tableau; menganalisis, memvisualisasikan, dan menafsirkan data untuk mendukung keputusan.","edu2.m":"S.Kom. Teknologi Informasi · Jun 2016 – Agu 2023","edu2.d":"Skripsi: \"Rancang Bangun Aplikasi Travel Berbasis Android\"",
+  "ct.h":"Whisper · kontak","f.note":"Mengirim akan membuka aplikasi email dengan pesan yang sudah terisi — tidak ada yang disimpan di server.","f.name":"NAMA","f.msg":"PESAN","f.send":"Kirim via email","f.sends":"KIRIM WHISPER",
+  "inv.n":"[Renaldy] mengundangmu ke party.","inv.h":"Siap bekerja sama?","inv.p":"Merekrut untuk data, frontend, backend atau fullstack — atau butuh website atau aplikasi? Biasanya saya membalas dalam sehari.","rq.a":"MISI REKRUTMEN","rq.a1":"Posisi full-time","rq.a2":"Data · frontend · backend · fullstack · remote atau hybrid","rq.b":"MISI KOMISI","rq.b1":"Buat website atau aplikasi","rq.b2":"Toko online, landing page, admin panel, dashboard &amp; tools","inv.b":"Minta dibuatkan","inv.bs":"KIRIM KOMISI","inv.a":"Terima · Email saya","inv.as":"GABUNG PARTY",
+  "chat1":"[System] Renaldy telah login. Status: terbuka untuk kerja.","chat2":"Terima kasih sudah mampir! Whisper saya kapan saja —"
+};
+</script>
+<script src="assets/js/app.js?v=2"></script>
+<script>
+// quest board filters: type (own/main/train) × job class (data/fe/be/fs); shareable as ?lens=&type=
+const works=[...document.querySelectorAll('.work')], job=document.getElementById('job'), kinds=document.getElementById('kinds');
+const st={t:'all',k:'all'};
+function apply(){
+  [...job.children].forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===st.t));
+  kinds.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===st.k));
+  works.forEach(w=>{const okT=st.t==='all'||(w.dataset.t||'').split(' ').includes(st.t);const okK=st.k==='all'||!w.dataset.k||w.dataset.k===st.k;w.classList.toggle('dim',!(okT&&okK));});
+  const u=new URL(location);st.t==='all'?u.searchParams.delete('lens'):u.searchParams.set('lens',st.t);st.k==='all'?u.searchParams.delete('type'):u.searchParams.set('type',st.k);history.replaceState(null,'',u);
+}
+job.addEventListener('click',e=>{const b=e.target.closest('button');if(b){st.t=b.dataset.t;apply()}});
+kinds.addEventListener('click',e=>{const b=e.target.closest('button');if(b){st.k=b.dataset.k;apply()}});
+const qs=new URLSearchParams(location.search);
+if(['data','fe','be','fs'].includes(qs.get('lens')))st.t=qs.get('lens');
+if(['comm','own','main','train'].includes(qs.get('type')))st.k=qs.get('type');
+apply();
+
+// the invite's CV button opens the CV picker in the status window
+document.getElementById('invite-cv').addEventListener('click',e=>{
+  e.preventDefault(); e.stopPropagation(); const dd=document.querySelector('.status .dd');
+  dd.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(()=>dd.querySelector('[data-dd]').click(),450);
+});
+
+// mailto contact form (static site, no backend)
+document.getElementById('contact-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target, n=f.name.value.trim(), em=f.email.value.trim(), m=f.message.value.trim();
+  location.href='mailto:renaldybys@gmail.com?subject='+encodeURIComponent('Portfolio inquiry from '+n)+'&body='+encodeURIComponent(m+'\n\n— '+n+' ('+em+')');
+});
+</script>
 </body>
 </html>

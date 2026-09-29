@@ -1,0 +1,42 @@
+/* Case-study pages built natively on the fantasy theme (Tumbuu, Baraloo). Load after theme.css. */
+.back{font:700 12px/1 var(--fantasy);letter-spacing:.06em;text-transform:uppercase;color:var(--title-ink);text-decoration:none;padding:9px 11px;border-radius:8px;border:1px solid var(--frame);background:linear-gradient(#FFFDF7,#F6E8CC);margin-right:auto;margin-left:18px}
+.hero .win-b{padding:32px}
+.hero h1{font:800 clamp(30px,4.4vw,50px)/1.1 var(--fantasy)}
+.hero .lead{max-width:720px}
+.kicker{font:700 16px/1 var(--font-body);color:var(--npc);margin-bottom:14px}
+.facts{display:grid;grid-template-columns:repeat(5,1fr);margin-top:24px;border:1px solid var(--frame-soft);border-radius:10px;overflow:hidden}
+.facts div{padding:12px 14px;border-left:1px dotted var(--frame-soft);background:var(--win-2)}
+.facts div:first-child{border-left:0}
+.facts span{display:block;font:500 11px/1.2 var(--pixel);color:var(--ink-faint)}
+.facts b{display:block;font-weight:700;font-size:15px;margin-top:4px}
+.hero .row{margin-top:24px}
+.shots{display:grid;grid-template-columns:2.3fr 1fr;gap:18px;align-items:start}
+.frame{border:1px solid var(--frame-soft);border-radius:10px;overflow:hidden;background:var(--win-2)}
+.frame img{width:100%}
+.cap{font-size:13px;color:var(--ink-faint);margin-top:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.four h3{font-size:17px;margin-bottom:6px}
+.four p,.two p,.prose p{color:var(--ink-soft);margin:0}
+.prose p + p{margin-top:12px}
+.qs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.qs span{background:var(--win-2);border:1px solid var(--frame-soft);border-radius:10px;padding:8px 12px;font-size:15px;color:var(--ink)}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.list{gap:16px}
+.list li{position:relative;padding-left:24px;color:var(--ink-soft)}
+.list li::before{content:"";position:absolute;left:2px;top:8px;width:9px;height:9px;transform:rotate(45deg);background:var(--gold-line);border:1px solid var(--gold)}
+.list b{display:block;color:var(--ink);font-weight:700;margin-bottom:2px}
+.stack{width:100%;border-collapse:collapse;font-size:15px}
+.stack th,.stack td{text-align:left;padding:12px 14px;border-bottom:1px dotted var(--frame-soft);vertical-align:top}
+.stack th{font:500 12px/1.2 var(--pixel);color:var(--ink-faint);font-weight:500}
+.stack td:first-child{font-weight:700;white-space:nowrap}
+.stack td:nth-child(2){font:500 13px/1.5 var(--font-mono);color:var(--title-ink)}
+.stack td:last-child{color:var(--ink-soft)}
+.tw{overflow-x:auto}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.note{font-size:13px;color:var(--ink-faint);margin-top:12px}
+@media (max-width:1000px){.four{grid-template-columns:1fr 1fr}.facts{grid-template-columns:repeat(3,1fr)}.facts div:nth-child(4){border-left:0}.facts div:nth-child(n+4){border-top:1px dotted var(--frame-soft)}}
+@media (max-width:760px){.shots,.two{grid-template-columns:1fr}.shots .m{max-width:300px;margin:0 auto}.hero .win-b{padding:22px}
+  .facts{grid-template-columns:1fr 1fr}.facts div{border-left:0!important;border-top:1px dotted var(--frame-soft)!important}.facts div:nth-child(-n+2){border-top:0!important}.facts div:nth-child(even){border-left:1px dotted var(--frame-soft)!important}.facts div:last-child{grid-column:span 2}
+  .stack td:first-child{white-space:normal}}
+@media (max-width:520px){.four{grid-template-columns:1fr}.back{margin-left:8px}}

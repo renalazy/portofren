@@ -18,9 +18,10 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="../assets/css/style.css?v=2">
+<link rel="stylesheet" href="../assets/css/case-bridge.css?v=4">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -37,18 +38,13 @@
   </symbol>
 </svg>
 
-<header class="site-header case-header">
-  <nav class="nav" aria-label="Primary">
-    <a class="brand" href="../index.html" aria-label="Renaldy Bilal Setyawan — home">
-      <img src="../assets/img/r.png" alt="" width="26" height="26">
-      <span aria-hidden="true">RBS</span>
-    </a>
-    <a class="case-back" href="../index.html#projects">
-      <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
-      All projects
-    </a>
-  </nav>
-</header>
+<header class="cnav" data-nav><div class="cnav-in">
+  <a class="clogo" href="../index.html" aria-label="Renaldy — home">Renaldy<span>.</span></a>
+  <a class="cback" href="../index.html#projects"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span data-i18n="back">All projects</span></a>
+  <div class="ctools">
+    <div class="seg" id="lang" role="group" aria-label="Language"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="id" aria-pressed="false">ID</button></div>
+  </div>
+</div></header>
 
 <main id="main">
 
@@ -411,10 +407,15 @@
     <div class="footer-links">
       <a href="../index.html#projects">← All projects</a>
       <a href="../index.html#contact">Contact</a>
+      <a href="https://github.com/renalazy" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.instagram.com/renxietyyyy/" target="_blank" rel="noopener">Instagram</a>
     </div>
   </div>
 </footer>
 
 <script src="../assets/js/main.js?v=2"></script>
+<script>window.I18N_ID={"back":"Semua proyek"};</script>
+<script src="../assets/js/app.js?v=2"></script>
 </body>
 </html>

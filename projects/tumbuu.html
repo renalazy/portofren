@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tumbuu — Case Study | Renaldy Bilal Setyawan</title>
+<meta name="description" content="Tumbuu is a parenting tracker web app built and launched by Renaldy Bilal Setyawan: Next.js, PostgreSQL, Better Auth, Cloudflare R2, Backblaze B2 backups and Midtrans payments.">
+<meta name="theme-color" content="#FCE3CF">
+<link rel="icon" type="image/png" href="../assets/img/r.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/theme.css?v=6">
+<link rel="stylesheet" href="../assets/css/case.css?v=1">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="nav" data-nav><div class="wrap">
+  <a class="logo" href="../index.html" aria-label="Renaldy — home">Renaldy<span>.</span></a>
+  <a class="back" href="../index.html#quests">← <span data-i18n="back">All quests</span></a>
+  <div class="nav-tools"><div class="seg" id="lang" role="group" aria-label="Language"><button data-lang="en" aria-pressed="true">EN</button><button data-lang="id" aria-pressed="false">ID</button></div></div>
+</div></header>
+
+<main id="main" class="wrap" style="padding-top:26px">
+
+  <div class="win hero">
+    <div class="win-t"><span data-i18n="w.q">★ Own product · live quest</span><span class="dots"><i>–</i><i>×</i></span></div>
+    <div class="win-b">
+      <div class="kicker">[Renaldy] · <span data-i18n="h.k">Case study</span></div>
+      <h1 data-i18n="h.h">Tumbuu — a parenting tracker, built and launched</h1>
+      <p class="lead" data-i18n="h.p">Parents get asked the same questions at the worst moments — when did she last drink, has the medicine been given, when did the fever start. Tumbuu lets them log it in seconds and hands it back as clean summaries. I designed, built and shipped it as my own product.</p>
+      <div class="facts">
+        <div><span data-i18n="f.1">QUEST TYPE</span><b data-i18n="f.1v">Own product</b></div>
+        <div><span data-i18n="f.2">LAUNCHED</span><b data-i18n="f.2v">September 2026</b></div>
+        <div><span data-i18n="f.3">PLATFORM</span><b data-i18n="f.3v">Web app + installable PWA</b></div>
+        <div><span data-i18n="f.4">MODEL</span><b data-i18n="f.4v">Free + Premium</b></div>
+        <div><span data-i18n="f.5">MARKET</span><b data-i18n="f.5v">Indonesian parents</b></div>
+      </div>
+      <div class="row">
+        <a class="btn btn--primary" href="https://temantumbuu.com/" target="_blank" rel="noopener"><span data-i18n="h.live">Visit temantumbuu.com ↗</span><small data-i18n="h.lives">ENTER THE MAP</small></a>
+        <div class="row" style="margin:0"><span class="sticker s-fe">Frontend</span><span class="sticker s-be">Backend</span><span class="sticker s-fs">Fullstack</span></div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="head"><span class="px" data-i18n="s1.px">THE STOREFRONT</span><h2 data-i18n="s1.h">What parents see first</h2></div>
+    <div class="win"><div class="win-t"><span data-i18n="s1.w">Landing page · desktop &amp; phone</span><span class="dots"><i>–</i></span></div><div class="win-b">
+      <div class="shots">
+        <figure style="margin:0"><div class="frame"><img src="../assets/img/tumbuu/landing-desktop.png" alt="Tumbuu landing page on desktop: headline, call to action and an app preview card with sample data" loading="lazy"></div><figcaption class="cap" data-i18n="s1.c1">Desktop, 1440px. The preview card uses fictional sample data.</figcaption></figure>
+        <figure style="margin:0" class="m"><div class="frame"><img src="../assets/img/tumbuu/landing-mobile.png" alt="Tumbuu landing page on a phone" loading="lazy"></div><figcaption class="cap" data-i18n="s1.c2">Phone, 390px.</figcaption></figure>
+      </div>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="head"><span class="px" data-i18n="s2.px">THE PROBLEM</span><h2 data-i18n="s2.h">Questions that come up at the busiest moments</h2></div>
+    <div class="win"><div class="win-t"><span data-i18n="s2.w">Quest brief</span></div><div class="win-b prose">
+      <div class="qs"><span data-i18n="q1">“When did she last drink?”</span><span data-i18n="q2">“Has the medicine been given?”</span><span data-i18n="q3">“Which day did the fever start?”</span><span data-i18n="q4">“What was his last weight?”</span><span data-i18n="q5">“What should we ask the doctor?”</span><span data-i18n="q6">“How long did she sleep?”</span></div>
+      <p data-i18n="s2.p1">The answers usually end up scattered — some in a parent's head, some in a chat with their partner, the rest on paper or in the photo gallery. Tumbuu collects them in one place, without making parents do the work twice.</p>
+      <p data-i18n="s2.p2">The design principle: <b>log only what you can</b>. Whatever gets logged is already enough to help later.</p>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="head"><span class="px" data-i18n="s3.px">FEATURES</span><h2 data-i18n="s3.h">Four things Tumbuu looks after</h2></div>
+    <div class="four">
+      <div class="win"><div class="win-t"><span data-i18n="c1.t">Daily care</span></div><div class="win-b"><p data-i18n="c1.p">Breastfeeding, bottle milk, meals, sleep, diapers, temperature and quick notes — saved in seconds, with the time pre-filled and editable.</p></div></div>
+      <div class="win"><div class="win-t"><span data-i18n="c2.t">Growth</span></div><div class="win-b"><p data-i18n="c2.p">Weight, height and head circumference as a history, plus a development checklist that follows Indonesia's Buku KIA, with the date each milestone was reached.</p></div></div>
+      <div class="win"><div class="win-t"><span data-i18n="c3.t">Health</span></div><div class="win-b"><p data-i18n="c3.p">Illness records with symptoms, temperature, medicine and dosing history, doctor visits, costs and immunizations. Document attachments on Premium.</p></div></div>
+      <div class="win"><div class="win-t"><span data-i18n="c4.t">Moments</span></div><div class="win-b"><p data-i18n="c4.p">Unlimited stories, with up to 5 photos on the free plan.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><span class="px" data-i18n="s4.px">PRODUCT DECISIONS</span><h2 data-i18n="s4.h">Choices I made as the product owner</h2></div>
+    <div class="two">
+      <div class="win"><div class="win-t"><span data-i18n="d.w1">Trust &amp; privacy</span></div><div class="win-b"><ul class="list">
+        <li data-i18n="d1"><b>No guessing</b>Every summary is computed only from what the parent logged. Tumbuu doesn't diagnose or replace a health professional, and says so on every page.</li>
+        <li data-i18n="d2"><b>Private by default</b>Records open only through the parent's account, and photos are stored privately — never behind public links.</li>
+        <li data-i18n="d3"><b>Location data stripped</b>Photo location data is removed on the device, before upload.</li>
+        <li data-i18n="d9"><b>Admin off the public internet</b>Internal tools are reachable only over a private Tailscale network, so there is no public admin login to probe.</li>
+        <li data-i18n="d4"><b>No ads, no selling family data</b>Stated up front, right next to the sign-up button.</li>
+      </ul></div></div>
+      <div class="win"><div class="win-t"><span data-i18n="d.w2">Business model</span></div><div class="win-b"><ul class="list">
+        <li data-i18n="d5"><b>Free for one child</b>Includes a basic daily summary — useful on its own, not a trial.</li>
+        <li data-i18n="d6"><b>Premium tier</b>Adds handover and doctor-consultation summaries, PDF reports and document attachments.</li>
+        <li data-i18n="d7"><b>Shared caregiving</b>Invite up to 4 extra caregivers with their own accounts. Each can only edit what they logged, and access can be revoked anytime.</li>
+        <li data-i18n="d8"><b>Local payments</b>Handled through Midtrans, with a published refund policy.</li>
+      </ul></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head"><span class="px" data-i18n="s5.px">UNDER THE HOOD</span><h2 data-i18n="s5.h">The stack</h2><p data-i18n="s5.p">End to end — interface, API, database, storage, payments and backups.</p></div>
+    <div class="win"><div class="win-t"><span data-i18n="s5.w">Equipment</span></div><div class="win-b tw">
+      <table class="stack">
+        <thead><tr><th data-i18n="t.h1">LAYER</th><th data-i18n="t.h2">TECHNOLOGY</th><th data-i18n="t.h3">WHAT IT DOES</th></tr></thead>
+        <tbody>
+          <tr><td data-i18n="t.1">App &amp; API</td><td>Next.js</td><td data-i18n="t.1d">Landing pages, the logged-in app and the server-side API in one codebase; installable as a PWA.</td></tr>
+          <tr><td data-i18n="t.2">Database</td><td>PostgreSQL</td><td data-i18n="t.2d">Children, caregivers, daily logs, growth, health records and subscriptions.</td></tr>
+          <tr><td data-i18n="t.3">Authentication</td><td>Better Auth</td><td data-i18n="t.3d">Email + password sign-up and login, password reset, per-caregiver accounts.</td></tr>
+          <tr><td data-i18n="t.4">File storage</td><td>Cloudflare R2</td><td data-i18n="t.4d">Private storage for photos and documents.</td></tr>
+          <tr><td data-i18n="t.5">Backups</td><td>Backblaze B2</td><td data-i18n="t.5d">Off-site database backups.</td></tr>
+          <tr><td data-i18n="t.8">Admin access</td><td>Tailscale</td><td data-i18n="t.8d">Internal admin tools on a private network, not exposed publicly.</td></tr>
+          <tr><td data-i18n="t.6">Payments</td><td>Midtrans</td><td data-i18n="t.6d">Premium subscriptions with Indonesian payment methods.</td></tr>
+        </tbody>
+      </table>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="head"><span class="px" data-i18n="s6.px">THE GATE</span><h2 data-i18n="s6.h">Behind the login</h2><p data-i18n="s6.p">The app holds real family records, so only the parents' entrance is shown. The internal admin side sits on a private network and isn't public at all.</p></div>
+    <div class="win"><div class="win-t"><span data-i18n="s6.w">Login · desktop &amp; phone</span></div><div class="win-b">
+      <div class="shots">
+        <figure style="margin:0"><div class="frame"><img src="../assets/img/tumbuu/login-desktop.png" alt="Tumbuu login page on desktop" loading="lazy"></div></figure>
+        <figure style="margin:0" class="m"><div class="frame"><img src="../assets/img/tumbuu/login-mobile.png" alt="Tumbuu login page on a phone" loading="lazy"></div></figure>
+      </div>
+    </div></div>
+  </section>
+
+  <section>
+    <div class="win"><div class="win-t"><span data-i18n="s7.w">Explore further</span></div><div class="win-b">
+      <div class="links">
+        <a class="btn btn--primary" href="https://temantumbuu.com/" target="_blank" rel="noopener"><span data-i18n="l.1">Live site ↗</span></a>
+        <a class="btn" href="https://temantumbuu.com/install" target="_blank" rel="noopener"><span data-i18n="l.2">Install as app ↗</span></a>
+        <a class="btn" href="https://temantumbuu.com/privacy" target="_blank" rel="noopener"><span data-i18n="l.3">Privacy ↗</span></a>
+        <a class="btn" href="https://temantumbuu.com/security" target="_blank" rel="noopener"><span data-i18n="l.4">Data security ↗</span></a>
+        <a class="btn" href="../index.html#contact"><span data-i18n="l.5">Talk to me about it</span></a>
+      </div>
+      <p class="note" data-i18n="l.n">Screenshots captured from the public site in September 2026.</p>
+    </div></div>
+  </section>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span>© <span id="current-year">2026</span> Renaldy Bilal Setyawan</span>
+  <span><a href="../index.html#quests" data-i18n="back">All quests</a><a href="https://github.com/renalazy" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.instagram.com/renxietyyyy/" target="_blank" rel="noopener">Instagram</a></span>
+</div></footer>
+
+<script>
+window.I18N_ID = {
+  "t.8d":"Tools admin internal di jaringan privat, tidak terbuka untuk publik.",
+  "t.8":"Akses admin",
+  "d9":"<b>Admin tidak terbuka di internet publik</b>Tools internal hanya bisa diakses lewat jaringan privat Tailscale, jadi tidak ada halaman login admin publik yang bisa dicoba-coba.",
+  "back":"Semua misi","w.q":"★ Produk sendiri · misi live","h.k":"Studi kasus","h.h":"Tumbuu — pencatat tumbuh kembang anak, dibangun dan diluncurkan",
+  "h.p":"Orang tua sering ditanya hal yang sama di saat paling repot — terakhir minum jam berapa, obatnya sudah diberi belum, demamnya mulai kapan. Tumbuu membuat mereka bisa mencatat dalam hitungan detik dan mengembalikannya sebagai ringkasan yang rapi. Saya merancang, membangun, dan meluncurkannya sebagai produk saya sendiri.",
+  "f.1":"JENIS MISI","f.1v":"Produk sendiri","f.2":"RILIS","f.2v":"September 2026","f.3":"PLATFORM","f.3v":"Aplikasi web + PWA","f.4":"MODEL","f.4v":"Gratis + Premium","f.5":"PASAR","f.5v":"Orang tua di Indonesia",
+  "h.live":"Kunjungi temantumbuu.com ↗","h.lives":"MASUK KE PETA",
+  "s1.px":"ETALASE","s1.h":"Yang pertama dilihat orang tua","s1.w":"Landing page · desktop &amp; HP","s1.c1":"Desktop, 1440px. Kartu pratinjau memakai data contoh fiktif.","s1.c2":"HP, 390px.",
+  "s2.px":"MASALAH","s2.h":"Pertanyaan yang muncul saat paling repot","s2.w":"Brief misi",
+  "q1":"“Terakhir minum jam berapa, ya?”","q2":"“Obatnya sudah diberi belum?”","q3":"“Demamnya mulai hari apa?”","q4":"“Berat badannya terakhir berapa?”","q5":"“Apa saja yang perlu ditanyakan ke dokter?”","q6":"“Tadi tidurnya berapa lama?”",
+  "s2.p1":"Jawabannya biasanya berserakan — sebagian di kepala, sebagian di chat pasangan, sisanya di kertas atau galeri foto. Tumbuu mengumpulkannya jadi satu, tanpa membuat orang tua kerja dua kali.","s2.p2":"Prinsip desainnya: <b>catat seperlunya</b>. Yang sempat dicatat saja sudah cukup untuk menolong nanti.",
+  "s3.px":"FITUR","s3.h":"Empat hal yang Tumbuu jaga","c1.t":"Keseharian","c1.p":"Menyusui, susu botol, makan, tidur, popok, suhu, dan catatan singkat — tersimpan dalam hitungan detik, dengan waktu yang otomatis terisi dan bisa diubah.",
+  "c2.t":"Pertumbuhan","c2.p":"Berat, tinggi, dan lingkar kepala tersimpan sebagai riwayat, plus ceklis perkembangan mengikuti Buku KIA lengkap dengan tanggal pencapaiannya.",
+  "c3.t":"Kesehatan","c3.p":"Catatan sakit dengan gejala, suhu, obat dan riwayat pemberiannya, kunjungan, biaya, dan imunisasi. Lampiran dokumen di Premium.","c4.t":"Momen","c4.p":"Cerita tanpa batas, dengan hingga 5 foto di paket gratis.",
+  "s4.px":"KEPUTUSAN PRODUK","s4.h":"Pilihan saya sebagai pemilik produk","d.w1":"Kepercayaan &amp; privasi","d.w2":"Model bisnis",
+  "d1":"<b>Tanpa tebakan</b>Setiap ringkasan dihitung hanya dari yang dicatat orang tua. Tumbuu tidak memberi diagnosis atau menggantikan tenaga kesehatan, dan menyatakannya di setiap halaman.",
+  "d2":"<b>Privat sejak awal</b>Catatan hanya bisa dibuka lewat akun orang tua, dan foto disimpan privat — tidak pernah lewat tautan publik.","d3":"<b>Data lokasi dihapus</b>Data lokasi pada foto dihapus di perangkat, sebelum diunggah.","d4":"<b>Tanpa iklan, tanpa menjual data keluarga</b>Dinyatakan jelas, tepat di samping tombol daftar.",
+  "d5":"<b>Gratis untuk satu anak</b>Termasuk ringkasan harian dasar — berguna sendiri, bukan sekadar uji coba.","d6":"<b>Paket Premium</b>Menambah ringkasan serah terima dan konsultasi dokter, laporan PDF, dan lampiran dokumen.",
+  "d7":"<b>Berbagi pengasuhan</b>Undang hingga 4 pengasuh tambahan dengan akun masing-masing. Setiap pengasuh hanya bisa mengubah catatannya sendiri, dan akses bisa dicabut kapan saja.","d8":"<b>Pembayaran lokal</b>Diproses lewat Midtrans, dengan kebijakan pengembalian dana yang dipublikasikan.",
+  "s5.px":"DI BALIK LAYAR","s5.h":"Teknologi yang dipakai","s5.p":"Dari ujung ke ujung — antarmuka, API, database, penyimpanan, pembayaran, dan backup.","s5.w":"Equipment",
+  "t.h1":"LAPISAN","t.h2":"TEKNOLOGI","t.h3":"FUNGSINYA","t.1":"Aplikasi &amp; API","t.1d":"Landing page, aplikasi setelah login, dan API server dalam satu codebase; bisa dipasang sebagai PWA.",
+  "t.2":"Database","t.2d":"Data anak, pengasuh, catatan harian, pertumbuhan, kesehatan, dan langganan.","t.3":"Autentikasi","t.3d":"Daftar dan masuk dengan email + kata sandi, reset kata sandi, akun per pengasuh.",
+  "t.4":"Penyimpanan file","t.4d":"Penyimpanan privat untuk foto dan dokumen.","t.5":"Backup","t.5d":"Backup database di luar server utama.","t.6":"Pembayaran","t.6d":"Langganan Premium dengan metode pembayaran Indonesia.",
+  "s6.px":"GERBANG","s6.h":"Di balik login","s6.p":"Aplikasinya menyimpan catatan keluarga sungguhan, jadi hanya pintu masuk orang tua yang ditampilkan. Sisi admin internal berada di jaringan privat dan sama sekali tidak publik.","s6.w":"Login · desktop &amp; HP",
+  "s7.w":"Jelajahi lebih lanjut","l.1":"Situs live ↗","l.2":"Pasang sebagai aplikasi ↗","l.3":"Privasi ↗","l.4":"Keamanan data ↗","l.5":"Ngobrol soal ini","l.n":"Screenshot diambil dari situs publik pada September 2026."
+};
+</script>
+<script src="../assets/js/app.js?v=2"></script>
+</body>
+</html>
