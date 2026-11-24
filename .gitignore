@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+.DS_Store
+*.tsbuildinfo
+
+# local Claude Code settings
+.claude/settings.local.json
+.claude/launch.json

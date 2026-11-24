@@ -8,7 +8,7 @@ built converter is smaller and more predictable here than a general one.
 
     python3 tools/build_notebooks.py
 
-Writes projects/notebooks/*.html. Re-run after re-executing a notebook.
+Writes public/projects/notebooks/*.html. Re-run after re-executing a notebook.
 """
 
 import html
@@ -17,8 +17,8 @@ import os
 import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "downloads", "gayanara")
-OUT = os.path.join(ROOT, "projects", "notebooks")
+SRC = os.path.join(ROOT, "public", "downloads", "gayanara")
+OUT = os.path.join(ROOT, "public", "projects", "notebooks")
 
 NOTEBOOKS = [
     {
@@ -27,7 +27,7 @@ NOTEBOOKS = [
         "phase": "Phase 1 · Data Quality Audit",
         "title": "01. Data Quality Audit & Cleaning",
         "desc": "Executed notebook: four data quality checks in SQL on the Gayanara "
-                "e-commerce dataset — null audit, duplicate customers, category "
+                "e-commerce dataset: null audit, duplicate customers, category "
                 "standardization, and referential integrity.",
     },
     {
@@ -202,6 +202,32 @@ def render_outputs(cell):
     return '<div class="nb-out"><span class="nb-gutter">Out</span><div class="nb-out-body">%s</div></div>' % "".join(parts)
 
 
+# ------------------------------------------------------------------- tidy
+
+# The site avoids em and en dashes in prose. These rewrites read naturally
+# in the notebook text; anything left over becomes a comma.
+DASHES = [
+    ("analytical workflow — data auditing, SQL modeling, segmentation, and BI delivery — not to",
+     "analytical workflow (data auditing, SQL modeling, segmentation, and BI delivery), not to"),
+    ("<strong>Decision — no deduplication applied:</strong>", "<strong>Decision, no deduplication applied:</strong>"),
+    ("2024–25", "2024 and 2025"),
+    ("Jan 2022 – Feb 2025", "Jan 2022 to Feb 2025"),
+    ("<strong>Champions — ", "<strong>Champions: "),
+    ("This is misleading — ", "This is misleading: "),
+    ("Month 1 — tenure", "Month 1: tenure"),
+    ("</em> — ", "</em>: "),
+    # jupysql's docs domain is gone; point the truncation notice at the repo.
+    ("https://jupysql.ploomber.io/en/latest/api/configuration.html#displaylimit", "https://github.com/ploomber/jupysql"),
+]
+
+
+def tidy(page):
+    for old, new in DASHES:
+        page = page.replace(old, new)
+    page = re.sub(r"(\d)–(\d)", r"\1 to \2", page)
+    return page.replace(" — ", ", ")
+
+
 # ------------------------------------------------------------------- page
 
 PAGE = """<!doctype html>
@@ -214,38 +240,25 @@ PAGE = """<!doctype html>
 <meta name="author" content="Renaldy Bilal Setyawan">
 <meta name="robots" content="index, follow">
 
-<link rel="icon" type="image/png" href="../../assets/img/r.png">
-<link rel="apple-touch-icon" href="../../assets/img/r.png">
+<link rel="icon" type="image/png" href="../../assets/img/r-stamp-48.png?v=2">
+<link rel="apple-touch-icon" href="../../assets/img/r-stamp-180.png?v=2">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Bungee&family=Caveat:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="../../assets/css/style.css?v=2">
-<link rel="stylesheet" href="../../assets/css/notebook.css?v=1">
+<link rel="stylesheet" href="../../assets/css/sketch-notebook.css?v=3">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
-<svg class="icon-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
-  <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="19" y1="12" x2="5" y2="12"></line>
-    <polyline points="12 19 5 12 12 5"></polyline>
-  </symbol>
-</svg>
-
-<header class="site-header case-header">
-  <nav class="nav" aria-label="Primary">
-    <a class="brand" href="../../index.html" aria-label="Renaldy Bilal Setyawan — home">
-      <img src="../../assets/img/r.png" alt="" width="26" height="26">
-      <span aria-hidden="true">RBS</span>
-    </a>
-    <a class="case-back" href="../gayanara-ecommerce.html">
-      <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"></use></svg>
-      Back to case study
-    </a>
-  </nav>
-</header>
+<header class="sk-head"><div class="wrap">
+  <div class="sk-left">
+    <a class="sk-logo" href="../../" aria-label="Renaldy, home">R.</a>
+    <a class="sk-back" href="../gayanara-ecommerce/">← back to the case study</a>
+  </div>
+  <nav class="sk-nav" aria-label="Main"><a href="../../#about">About</a><a href="../../#work">Work</a><a href="../../#contact">Contact</a></nav>
+</div></header>
 
 <main id="main">
   <section class="nb-hero graph-paper">
@@ -255,7 +268,7 @@ PAGE = """<!doctype html>
       <p class="nb-hero-sub">{desc}</p>
       <p class="nb-source">Source notebook: <code>{srcname}</code> · rendered with saved cell outputs, exactly as executed.</p>
       <div class="case-resource-links">
-        <a class="btn btn-secondary" href="../gayanara-ecommerce.html">Read the case study</a>
+        <a class="btn btn-secondary" href="../gayanara-ecommerce/">Read the case study</a>
         <a class="btn btn-secondary" href="../../downloads/gayanara/{srcname}" download>Download .ipynb</a>
         <a class="btn btn-secondary" href="https://github.com/renalazy/gayanara-ecommerce" target="_blank" rel="noopener">GitHub repo</a>
       </div>
@@ -269,12 +282,10 @@ PAGE = """<!doctype html>
   </section>
 </main>
 
-<footer class="site-footer">
-  <div class="wrap">
-    <p>Renaldy Bilal Setyawan · <a href="../gayanara-ecommerce.html">Gayanara case study</a> · <a href="../../index.html">All projects</a></p>
-  </div>
-</footer>
-
+<footer class="sk-foot"><div class="wrap">
+  <p class="big">RENALDY</p>
+  <nav aria-label="Footer"><a href="../gayanara-ecommerce/">Gayanara case study</a><a href="../../#work">All work</a><a href="https://github.com/renalazy" target="_blank" rel="noopener">GitHub ↗</a><a href="https://www.linkedin.com/in/renaldy-bilal-setyawan-0462b2286/" target="_blank" rel="noopener">LinkedIn ↗</a><a href="https://www.instagram.com/renxietyyyy/" target="_blank" rel="noopener">Instagram ↗</a></nav>
+</div></footer>
 </body>
 </html>
 """
@@ -313,7 +324,7 @@ def build(spec):
     os.makedirs(OUT, exist_ok=True)
     dest = os.path.join(OUT, spec["out"])
     with open(dest, "w", encoding="utf-8") as fh:
-        fh.write(page)
+        fh.write(tidy(page))
     print("wrote %s (%d cells)" % (os.path.relpath(dest, ROOT), len(chunks)))
 
 
